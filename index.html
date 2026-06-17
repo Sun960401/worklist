@@ -92,6 +92,7 @@
   .status-取消 { background: #eee; color: #7f8c8d; }
   .priority-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
   .priority-高 { background: #ffeaea; color: #c0392b; }
+  .priority-极高 { background: #fff0e0; color: #e67e22; }
   .priority-中 { background: #fff8e0; color: #b7950b; }
   .priority-低 { background: #e8f8f0; color: #27ae60; }
   .actions { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -331,6 +332,7 @@
         <div class="form-group">
           <label>优先级</label>
           <select id="input-priority">
+            <option value="极高">极高</option>
             <option value="高">高</option>
             <option value="中">中</option>
             <option value="低">低</option>
@@ -559,6 +561,7 @@ function save() {
   }
   saveListsData();
   renderSidebar();
+  render();
   if (cloudSync.token && cloudSync.gistId) {
     cloudSync.push().catch(() => {});
   }
@@ -570,6 +573,7 @@ function saveResourcesOnly() {
   }
   saveListsData();
   renderSidebar();
+  render();
   if (cloudSync.token && cloudSync.gistId) {
     cloudSync.push().catch(() => {});
   }
@@ -586,59 +590,56 @@ function getProjectStats(projectName) {
 function initSampleData() {
   if (tasks.length > 0) return;
   if (cloudSync.token && cloudSync.gistId) { cloudSync.pull().catch(() => {}); return; }
-  if (!listsData[currentListId]) return;
-  const today = new Date().toISOString().split('T')[0];
-  tasks = [
-    { id: 1, date: today, project: '华理未来学习中心', task: '系统梳理：华东理工大学多层次信息化学习平台', status: '进行中', priority: '高', due: '', done: '', updates: [
-      { date: '2025-06-16', content: '在线虚拟实验疑似假，VR实训无法查看，虚拟仿真平台校外无法访问' },
-      { date: '2025-06-16', content: '6月16日在华理工开会沟通，明确项目进入实施阶段' },
-      { date: '2025-06-16', content: '等待产品通知开会，明确每周任务' }
-    ]},
-    { id: 2, date: today, project: '华理未来学习中心', task: '虚拟展厅系统梳理', status: '进行中', priority: '高', due: '', done: '', updates: [
-      { date: '2025-06-16', content: '与主系统同步梳理中' }
-    ]},
-    { id: 3, date: today, project: '华理未来学习中心', task: '撰写每周计划', status: '待办', priority: '高', due: '', done: '', updates: [
-      { date: '2025-06-16', content: '等待产品通知开会后，明确每周任务并撰写计划' }
-    ]},
-    { id: 4, date: today, project: '同济启明星项目', task: '生科院专业建设去重问题', status: '进行中', priority: '高', due: '', done: '', updates: [
-      { date: '2025-06-16', content: '院长问题：如何判定每门课的知识点有重合，专业建设如何去重——需给出解决方案' }
-    ]},
-    { id: 5, date: today, project: '同济启明星项目', task: '电信学院专业建设', status: '进行中', priority: '高', due: '', done: '', updates: [
-      { date: '2025-06-16', content: '资料建设已完成，等待学院提供新资料' },
-      { date: '2025-06-16', content: '老师说：最近系里在大改课程大纲，内容和老师有可能变化，可能需要两三周时间' }
-    ]},
-    { id: 6, date: today, project: '同济启明星项目', task: '剩余4个学院建设（共20个学院）', status: '待办', priority: '中', due: '', done: '', updates: [
-      { date: '2025-06-16', content: '已有16个学院建设完成，待完成最后4个学院' }
-    ]},
-    { id: 7, date: today, project: '同济启明星项目', task: '口腔学院优化', status: '已完成', priority: '中', due: '', done: '2025-06-13', updates: [
-      { date: '2025-06-13', content: '上周已完成口腔学院优化' }
-    ]},
-    { id: 8, date: today, project: '同济启明星项目', task: '计算机学院初步建设', status: '已完成', priority: '中', due: '', done: '2025-06-13', updates: [
-      { date: '2025-06-13', content: '上周已完成计算机学院初步建设' }
-    ]},
-    { id: 9, date: today, project: '同济微单元项目', task: '法学院微单元建设', status: '已完成', priority: '中', due: '', done: '2025-06-16', updates: [
-      { date: '2025-06-16', content: '法学院已完成建设' }
-    ]},
-    { id: 10, date: today, project: '同济微单元项目', task: '材料学院微单元建设', status: '进行中', priority: '中', due: '', done: '', updates: [
-      { date: '2025-06-16', content: '建设中' }
-    ]},
-    { id: 11, date: today, project: '同济微单元项目', task: '艺术与传媒学院微单元建设', status: '进行中', priority: '中', due: '', done: '', updates: [
-      { date: '2025-06-16', content: '建设中' }
-    ]},
-    { id: 12, date: today, project: '电机大项目', task: '项目跟进旁听', status: '进行中', priority: '中', due: '', done: '', updates: [
-      { date: '2025-06-16', content: '跟着听项目会议/进度' }
-    ]},
-    { id: 13, date: today, project: '山西医科大学项目', task: '项目跟进旁听', status: '进行中', priority: '中', due: '', done: '', updates: [
-      { date: '2025-06-16', content: '跟着听项目会议/进度' }
-    ]},
-    { id: 14, date: today, project: '智能体学习', task: '智能体搭建学习', status: '进行中', priority: '高', due: '', done: '', updates: [
-      { date: '2025-06-16', content: '正在学习智能体搭建相关技术' }
-    ]},
-    { id: 15, date: today, project: '外勤讲座', task: '高职东海学校智能体培训讲座', status: '待办', priority: '高', due: '2025-06-26', done: '', updates: [
-      { date: '2025-06-16', content: '6月26日进行智能体培训讲座，需提前准备材料和PPT' }
-    ]},
-  ];
-  save();
+  // 加载用户备份数据
+  const backupData = {
+    "lists": {
+      "default": {
+        "id": "default",
+        "name": "工作清单",
+        "icon": "📋",
+        "tasks": [
+          {"id": 1, "date": "2026-06-16", "project": "华理未来学习中心", "task": "项目建设总览", "status": "进行中", "priority": "高", "due": "", "done": "", "updates": [{"date": "2025-06-16", "content": "在线虚拟实验疑似假，VR实训无法查看，虚拟仿真平台校外无法访问"},{"date": "2025-06-16", "content": "6月16日在华理工开会沟通，明确项目进入实施阶段"},{"date": "2025-06-16", "content": "等待产品通知开会，明确每周任务"}]},
+          {"id": 2, "date": "2026-06-16", "project": "华理未来学习中心", "task": "虚拟展厅系统梳理", "status": "进行中", "priority": "高", "due": "", "done": "", "updates": [{"date": "2025-06-16", "content": "与主系统同步梳理中"}]},
+          {"id": 3, "date": "2026-06-16", "project": "华理未来学习中心", "task": "撰写每周计划", "status": "待办", "priority": "高", "due": "", "done": "", "updates": [{"date": "2025-06-16", "content": "等待产品通知开会后，明确每周任务并撰写计划"}]},
+          {"id": 6, "date": "2026-06-16", "project": "同济启明星项目", "task": "项目总览", "status": "进行中", "priority": "中", "due": "", "done": "2026-06-17", "updates": [{"date": "2025-06-16", "content": "已有16个学院建设完成，待完成最后4个学院"},{"date": "2026-06-17", "content": "状态变更为「进行中」"},{"date": "2026-06-17", "content": "状态变更为「已完成」"},{"date": "2026-06-17", "content": "状态变更为「阻塞/暂停」"},{"date": "2026-06-17", "content": "状态变更为「已完成」"},{"date": "2026-06-17", "content": "状态变更为「阻塞/暂停」"}]},
+          {"id": 7, "date": "2026-06-16", "project": "同济启明星项目", "task": "口腔学院专业建设和专业门户优化", "status": "已完成", "priority": "中", "due": "", "done": "2025-06-13", "updates": [{"date": "2025-06-13", "content": "上周已完成口腔学院优化"}]},
+          {"id": 8, "date": "2026-06-16", "project": "同济启明星项目", "task": "计算机学院初步建设", "status": "已完成", "priority": "中", "due": "", "done": "2025-06-13", "updates": [{"date": "2025-06-13", "content": "上周已完成计算机学院初步建设"}]},
+          {"id": 4, "date": "2026-06-16", "project": "同济启明星项目", "task": "生科院专业建设去重问题", "status": "进行中", "priority": "中", "due": "", "done": "", "updates": [{"date": "2025-06-16", "content": "院长问题：如何判定每门课的知识点有重合，专业建设如何去重——需给出解决方案"}]},
+          {"id": 5, "date": "2026-06-16", "project": "同济启明星项目", "task": "电信学院专业建设", "status": "进行中", "priority": "中", "due": "", "done": "", "updates": [{"date": "2025-06-16", "content": "资料建设已完成，等待学院提供新资料"},{"date": "2025-06-16", "content": "老师说：最近系里在大改课程大纲，内容和老师有可能变化，可能需要两三周时间"}]},
+          {"id": 9, "date": "2026-06-16", "project": "同济微单元项目", "task": "法学院微单元建设", "status": "已完成", "priority": "中", "due": "", "done": "2025-06-16", "updates": [{"date": "2025-06-16", "content": "法学院已完成建设"}]},
+          {"id": 10, "date": "2026-06-16", "project": "同济微单元项目", "task": "材料学院微单元建设", "status": "进行中", "priority": "中", "due": "", "done": "", "updates": [{"date": "2025-06-16", "content": "建设中"}]},
+          {"id": 11, "date": "2026-06-16", "project": "同济微单元项目", "task": "艺术与传媒学院微单元建设", "status": "进行中", "priority": "中", "due": "", "done": "", "updates": [{"date": "2025-06-16", "content": "建设中"}]},
+          {"id": 12, "date": "2026-06-16", "project": "电机大项目", "task": "项目跟进旁听", "status": "进行中", "priority": "中", "due": "", "done": "", "updates": [{"date": "2025-06-16", "content": "跟着听项目会议/进度"}]},
+          {"id": 13, "date": "2026-06-16", "project": "山西医科大学项目", "task": "项目跟进旁听", "status": "进行中", "priority": "中", "due": "", "done": "", "updates": [{"date": "2025-06-16", "content": "跟着听项目会议/进度"}]},
+          {"id": 14, "date": "2026-06-16", "project": "智能体学习", "task": "智能体搭建学习", "status": "进行中", "priority": "高", "due": "", "done": "", "updates": [{"date": "2025-06-16", "content": "正在学习智能体搭建相关技术"}]},
+          {"id": 15, "date": "2026-06-16", "project": "外勤讲座", "task": "高职东海学校智能体培训讲座", "status": "待办", "priority": "中", "due": "2025-06-26", "done": "", "updates": [{"date": "2025-06-16", "content": "6月26日进行智能体培训讲座，需提前准备材料和PPT"}]}
+        ],
+        "projectResources": {
+          "同济启明星项目": [
+            {"title": "同济启明星项目建设", "date": "2026-06-16", "html": "&nbsp;任振老师发的参考资料<br>\nhttps://sharewh2.xuexi365.com/share/14ddacbb-f302-491d-b798-ecc8083b9fed?t=3<br>\n<br>\n专业建设操作手册：https://noteyd.chaoxing.com/pc/5d278204-1beb-452b-8524-b80dc37b563e<br>\n<br>\n<br>\n<br>\n专业建设和门户操作笔记<br>\nhttps://mooc1.chaoxing.com/mycourse/studentstudy?chapterId=1170397823&amp;courseId=259976259&amp;clazzid=145963274&amp;cpi=550138994&amp;enc=2d2626d8b81b8e940cc20ffb25a6b0ad&amp;mooc2=1&amp;hidetype=0&amp;openc=b8411277c28c40d008114dfa3987accc<br>\n<br>\n<br>\n超星智慧课程案例+专业建设：<br>\nhttps://zhkc.mh.chaoxing.com/?wfwfid=345152&amp;pageId=2622988&amp;websiteId=1013011&amp;uid=432143981&amp;mhType=2&amp;publicId=afac750a-e97a34ba82ae1c-b9f5b2adaff3&amp;mhEnc=d6c2929179295dff36d3f7443fa84dab<br>\n<br>\n启明星门户模板配置手册26.5<br>\nhttps://sharewh2.xuexi365.com/share/404c022c-44aa-4a1b-9242-6198955ac2aa?t=3"}
+          ],
+          "同济微单元项目": [
+            {"title": "微单元笔记", "date": "2026-06-16", "html": "&nbsp;同济有大概20个启明星建设，于建娉跟宋总沟通了下，这个项目想让我前头统筹<br>\n<br>\n<br>\nhttps://noteyd.chaoxing.com/pc/40d25bed-17b1-445a-8300-66482a4bd4ad&nbsp;&nbsp;&nbsp;这里有详细的流程笔记，任振待会把大家加入到后台管理员中，通过V1.chaoxing.com,会看到同济大学后台。下周一约大家时间，任振给大家统一培训安排一下"},
+            {"title": "专业图谱建设学校需要提供的资料", "date": "2026-06-16", "html": "&nbsp;https://noteyd.chaoxing.com/pc/1a8f3d13-8f15-4b36-bcf6-b7d0c62ce649"}
+          ],
+          "智能体学习": [
+            {"title": "智能体搭建企业网址", "date": "2026-06-16", "html": "<div>登录地址：https://www.coze.cn/sign/oauth?platform=volcano&amp;volc_ci_ctx=userType%3DBasicUser%26autoConfirm%3D1%26companyAlias%3D2101961411%26instanceName%3D16273914114</div><div><br></div><div><div>团队别名：2101961411</div><div>成员名：chaoxingShanghaiLab</div><div>密码：chaoxingShanghaiLab1</div></div>"}
+          ],
+          "外勤讲座": [
+            {"title": "个人出勤工作记录", "date": "2026-06-17", "html": "<a href=\"https://my.feishu.cn/wiki/Guf4wscSXiLo2QkGWd6ciexnn2T\">https://my.feishu.cn/wiki/Guf4wscSXiLo2QkGWd6ciexnn2T</a>"}
+          ],
+          "华理未来学习中心": [
+            {"title": "项目任务清单", "date": "2026-06-17", "html": "<a href=\"https://dcne43stwkm4.feishu.cn/wiki/YazTwjt0hiJWotkNN9fc3ITFnCe\">https://dcne43stwkm4.feishu.cn/wiki/YazTwjt0hiJWotkNN9fc3ITFnCe</a>"}
+          ]
+        }
+      }
+    }
+  };
+  listsData = backupData.lists;
+  const list = listsData['default'];
+  tasks = list.tasks || [];
+  projectResources = list.projectResources || {};
+  saveListsData();
 }
 
 // ========== 渲染 ==========
@@ -878,11 +879,35 @@ function showHistory(event, taskId) {
   if (activeHistoryPopover) { activeHistoryPopover.remove(); activeHistoryPopover = null; }
   const t = tasks.find(x => x.id === taskId); if (!t.updates || t.updates.length === 0) return;
   const popover = document.createElement('div'); popover.className = 'history-popover';
-  const historyHtml = [...t.updates].reverse().map((u, i) => '<div class="update-item" style="' + (i === 0 ? 'background:#f8f9ff;padding:8px;border-radius:6px;' : '') + '"><span class="update-date">' + u.date + '</span><span class="update-content">' + esc(u.content) + '</span></div>').join('');
+  const reversedUpdates = [...t.updates].reverse();
+  const historyHtml = reversedUpdates.map((u, i) => {
+    const originalIdx = t.updates.length - 1 - i;
+    return '<div class="update-item" style="' + (i === 0 ? 'background:#f8f9ff;padding:8px;border-radius:6px;' : '') + 'display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">' +
+      '<div style="flex:1;"><span class="update-date">' + u.date + '</span><span class="update-content">' + esc(u.content) + '</span></div>' +
+      '<div style="display:flex;gap:6px;flex-shrink:0;"><button class="btn btn-link" style="font-size:11px;" onclick="event.stopPropagation();editHistory(' + taskId + ',' + originalIdx + ')">修改</button><button class="btn btn-link" style="font-size:11px;color:#e74c3c;" onclick="event.stopPropagation();deleteHistory(' + taskId + ',' + originalIdx + ')">删除</button></div>' +
+      '</div>';
+  }).join('');
   popover.innerHTML = '<button class="pop-close" onclick="closeHistory()">&times;</button><div class="pop-title">📋 ' + esc(t.task) + ' 更新历史</div>' + historyHtml;
   const btn = event.target; const rect = btn.getBoundingClientRect(); const container = document.querySelector('.container'); container.appendChild(popover); activeHistoryPopover = popover;
   const popRect = popover.getBoundingClientRect(); let top = rect.top - popRect.height - 10 + window.scrollY; let left = rect.left + window.scrollX; if (top < 10) top = rect.bottom + 10 + window.scrollY; if (left + popRect.width > window.innerWidth - 20) left = window.innerWidth - popRect.width - 20;
   popover.style.top = top + 'px'; popover.style.left = left + 'px';
+}
+function editHistory(taskId, updateIdx) {
+  const t = tasks.find(x => x.id === taskId); if (!t || !t.updates[updateIdx]) return;
+  const u = t.updates[updateIdx];
+  const newDate = prompt('修改日期（YYYY-MM-DD）：', u.date);
+  if (newDate === null) return;
+  const newContent = prompt('修改内容：', u.content);
+  if (newContent === null) return;
+  if (newDate.trim()) u.date = newDate.trim();
+  if (newContent.trim()) u.content = newContent.trim();
+  save(); closeHistory();
+}
+function deleteHistory(taskId, updateIdx) {
+  if (!confirm('确定删除这条历史记录？')) return;
+  const t = tasks.find(x => x.id === taskId); if (!t || !t.updates[updateIdx]) return;
+  t.updates.splice(updateIdx, 1);
+  save(); closeHistory();
 }
 function closeHistory() { if (activeHistoryPopover) { activeHistoryPopover.remove(); activeHistoryPopover = null; } }
 document.addEventListener('click', (e) => { if (activeHistoryPopover && !activeHistoryPopover.contains(e.target) && !e.target.closest('.btn-link')) { closeHistory(); } });
