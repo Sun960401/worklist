@@ -326,7 +326,62 @@
   }
 
   
-  /* ===== 云同步状态 ===== */
+  
+  /* ===== 登录/注册界面 ===== */
+  .login-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 3000; padding: 20px;
+  }
+  .login-overlay.hidden { display: none; }
+  .login-card {
+    background: white; border-radius: 20px; padding: 40px;
+    width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: loginSlide 0.4s ease;
+  }
+  @keyframes loginSlide { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .login-card h2 { text-align: center; margin-bottom: 8px; font-size: 24px; color: #333; }
+  .login-card .subtitle { text-align: center; color: #888; font-size: 14px; margin-bottom: 28px; }
+  .login-card .form-group { margin-bottom: 18px; }
+  .login-card .form-group label { font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; display: block; }
+  .login-card .form-group input { width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; }
+  .login-card .form-group input:focus { border-color: #667eea; outline: none; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+  .login-card .btn-full { width: 100%; justify-content: center; padding: 14px; font-size: 15px; margin-top: 4px; }
+  .login-card .switch-mode { text-align: center; margin-top: 16px; font-size: 13px; color: #666; }
+  .login-card .switch-mode a { color: #667eea; cursor: pointer; font-weight: 600; }
+  .login-card .switch-mode a:hover { text-decoration: underline; }
+  .login-card .error-msg { color: #e74c3c; font-size: 13px; text-align: center; margin-top: 8px; display: none; }
+  .login-card .error-msg.show { display: block; }
+  .login-card .user-list { margin-top: 16px; border-top: 1px solid #eee; padding-top: 16px; }
+  .login-card .user-list h4 { font-size: 13px; color: #888; margin-bottom: 10px; }
+  .login-card .user-chip { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 8px; background: #f8f9ff; margin-bottom: 6px; cursor: pointer; transition: all 0.2s; }
+  .login-card .user-chip:hover { background: #f0f2ff; }
+  .login-card .user-chip .name { font-size: 14px; font-weight: 500; color: #333; }
+  .login-card .user-chip .delete { color: #ccc; font-size: 16px; padding: 2px 6px; border-radius: 4px; }
+  .login-card .user-chip .delete:hover { color: #e74c3c; background: #ffeaea; }
+
+  /* ===== 用户信息栏 ===== */
+  .user-bar { display: flex; align-items: center; gap: 8px; }
+  .user-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .user-name { font-size: 14px; color: #555; font-weight: 500; }
+  .user-dropdown { position: relative; }
+  .user-dropdown-menu {
+    position: absolute; top: 100%; right: 0; margin-top: 8px;
+    background: white; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    padding: 8px 0; min-width: 140px; display: none; z-index: 100;
+  }
+  .user-dropdown-menu.show { display: block; }
+  .user-dropdown-menu .item { padding: 8px 16px; font-size: 13px; color: #333; cursor: pointer; transition: all 0.15s; }
+  .user-dropdown-menu .item:hover { background: #f0f2ff; color: #667eea; }
+  .user-dropdown-menu .divider { border-top: 1px solid #eee; margin: 4px 0; }
+
+/* ===== 云同步状态 ===== */
   .sync-status {
     display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #888; padding: 6px 12px;
     background: white; border-radius: 8px; border: 1px solid #eee; cursor: pointer; transition: all 0.2s;
@@ -451,6 +506,32 @@
 </head>
 <body>
 
+
+<!-- 登录/注册界面 -->
+<div class="login-overlay" id="login-overlay">
+  <div class="login-card" id="login-card">
+    <h2>📋 工作清单</h2>
+    <div class="subtitle" id="login-subtitle">请登录或注册</div>
+    <div class="form-group">
+      <label>账号</label>
+      <input type="text" id="login-username" placeholder="输入账号" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label>密码</label>
+      <input type="password" id="login-password" placeholder="输入密码" autocomplete="off">
+    </div>
+    <div class="error-msg" id="login-error">账号或密码错误</div>
+    <button class="btn btn-primary btn-full" id="login-btn" onclick="handleLogin()">登录</button>
+    <div class="switch-mode" id="login-switch">
+      还没有账号？<a href="javascript:void(0)" onclick="switchToRegister()">立即注册</a>
+    </div>
+    <div class="user-list" id="user-list-section" style="display:none;">
+      <h4>👤 快速切换</h4>
+      <div id="user-list-container"></div>
+    </div>
+  </div>
+</div>
+
 <div class="container">
   <header>
     <h1>📋 工作清单</h1>
@@ -482,6 +563,22 @@
     <button class="btn btn-secondary btn-sm" onclick="document.getElementById('import-file').click()">📤 导入</button>
     <input type="file" id="import-file" style="display:none" accept=".json" onchange="importData(event)">
     <button class="btn btn-danger btn-sm" onclick="clearAll()">🗑️ 清空</button>
+
+    <div class="user-bar">
+      <div class="user-dropdown" onclick="toggleUserDropdown(event)">
+        <div class="user-avatar" id="user-avatar">?</div>
+      </div>
+      <div class="user-dropdown-menu" id="user-dropdown-menu">
+        <div class="item" style="font-weight:600;" id="dropdown-username">用户</div>
+        <div class="divider"></div>
+        <div class="item" onclick="openSyncModal()">☁️ 云同步设置</div>
+        <div class="item" onclick="exportData()">📥 导出数据</div>
+        <div class="item" onclick="document.getElementById('import-file').click()">📤 导入数据</div>
+        <div class="divider"></div>
+        <div class="item" onclick="logout()" style="color:#e74c3c;">🚪 退出登录</div>
+      </div>
+    </div>
+
     <div id="sync-status-btn" class="sync-status" onclick="openSyncModal()" title="点击配置云同步">
       <span class="sync-dot"></span>
       <span id="sync-status-text">未配置</span>
@@ -707,8 +804,9 @@
 
 <script>
 // ========== 数据存储 ==========
-const STORAGE_KEY = 'work_task_list_v5';
-const RESOURCES_KEY = 'work_project_resources';
+let STORAGE_KEY = 'work_task_list_v5';
+let RESOURCES_KEY = 'work_project_resources';
+const USERS_KEY = 'worklist_users';
 let tasks = [];
 let projectResources = {};
 let editingId = null;
@@ -719,14 +817,16 @@ let activeHistoryPopover = null;
 
 function load() {
   try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (data) {
-      const parsed = JSON.parse(data);
-      if (Array.isArray(parsed)) tasks = parsed;
-      else if (parsed.tasks && Array.isArray(parsed.tasks)) tasks = parsed.tasks;
+    if (currentUser) {
+      const data = localStorage.getItem(STORAGE_KEY);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) tasks = parsed;
+        else if (parsed.tasks && Array.isArray(parsed.tasks)) tasks = parsed.tasks;
+      }
+      const resData = localStorage.getItem(RESOURCES_KEY);
+      if (resData) projectResources = JSON.parse(resData);
     }
-    const resData = localStorage.getItem(RESOURCES_KEY);
-    if (resData) projectResources = JSON.parse(resData);
   } catch(e) { tasks = []; projectResources = {}; }
   tasks.forEach(t => {
     if (!t.updates || !Array.isArray(t.updates)) {
@@ -738,6 +838,7 @@ function load() {
 }
 
 function save() {
+  if (!currentUser) return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
   localStorage.setItem(RESOURCES_KEY, JSON.stringify(projectResources));
   render();
@@ -747,6 +848,7 @@ function save() {
 }
 
 function saveResourcesOnly() {
+  if (!currentUser) return;
   localStorage.setItem(RESOURCES_KEY, JSON.stringify(projectResources));
   render();
   if (cloudSync.token && cloudSync.gistId) {
@@ -1417,7 +1519,8 @@ function importData(event) {
 function clearAll() {
   if (!confirm('确定清空所有任务？此操作不可恢复！')) return;
   tasks = []; projectResources = {};
-  save();
+  if (currentUser) save();
+  else render();
 }
 
 // 点击遮罩关闭
@@ -1429,12 +1532,191 @@ window.onclick = function(e) {
   if (e.target === document.getElementById('sync-modal')) closeSyncModal();
 };
 
+
+// ========== 用户管理 ==========
+let currentUser = localStorage.getItem('worklist_current_user') || '';
+
+function updateUserKeys() {
+  if (currentUser) {
+    STORAGE_KEY = 'work_task_list_v5_' + currentUser;
+    RESOURCES_KEY = 'work_project_resources_' + currentUser;
+  } else {
+    STORAGE_KEY = 'work_task_list_v5';
+    RESOURCES_KEY = 'work_project_resources';
+  }
+}
+
+function getUsers() {
+  try {
+    const data = localStorage.getItem(USERS_KEY);
+    if (data) return JSON.parse(data);
+  } catch (e) {}
+  return [];
+}
+
+function saveUsers(users) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+}
+
+function hashPassword(password) {
+  let hash = 0;
+  for (let i = 0; i < password.length; i++) {
+    const char = password.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return 'h' + Math.abs(hash).toString(16);
+}
+
+function handleLogin() {
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+  const errorEl = document.getElementById('login-error');
+  if (!username || !password) {
+    errorEl.textContent = '请输入账号和密码';
+    errorEl.classList.add('show');
+    return;
+  }
+  const users = getUsers();
+  const user = users.find(u => u.username === username && u.passwordHash === hashPassword(password));
+  if (!user) {
+    errorEl.textContent = '账号或密码错误';
+    errorEl.classList.add('show');
+    return;
+  }
+  doLogin(username);
+}
+
+function handleRegister() {
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+  const errorEl = document.getElementById('login-error');
+  if (!username || !password) {
+    errorEl.textContent = '请输入账号和密码';
+    errorEl.classList.add('show');
+    return;
+  }
+  if (username.length < 2 || password.length < 4) {
+    errorEl.textContent = '账号至少2位，密码至少4位';
+    errorEl.classList.add('show');
+    return;
+  }
+  const users = getUsers();
+  if (users.find(u => u.username === username)) {
+    errorEl.textContent = '该账号已存在';
+    errorEl.classList.add('show');
+    return;
+  }
+  users.push({ username, passwordHash: hashPassword(password) });
+  saveUsers(users);
+  doLogin(username);
+}
+
+function doLogin(username) {
+  currentUser = username;
+  localStorage.setItem('worklist_current_user', username);
+  updateUserKeys();
+  document.getElementById('login-overlay').classList.add('hidden');
+  document.getElementById('user-avatar').textContent = username.charAt(0).toUpperCase();
+  document.getElementById('dropdown-username').textContent = '👤 ' + username;
+  load();
+  cloudSync.init();
+  renderUserList();
+}
+
+function logout() {
+  if (!confirm('确定退出登录？')) return;
+  currentUser = '';
+  localStorage.removeItem('worklist_current_user');
+  updateUserKeys();
+  tasks = [];
+  projectResources = {};
+  document.getElementById('user-dropdown-menu').classList.remove('show');
+  document.getElementById('login-overlay').classList.remove('hidden');
+  document.getElementById('login-username').value = '';
+  document.getElementById('login-password').value = '';
+  document.getElementById('login-error').classList.remove('show');
+  renderUserList();
+}
+
+function switchToRegister() {
+  document.getElementById('login-btn').textContent = '注册';
+  document.getElementById('login-btn').onclick = handleRegister;
+  document.getElementById('login-subtitle').textContent = '创建新账号';
+  document.getElementById('login-switch').innerHTML = '已有账号？<a href="javascript:void(0)" onclick="switchToLogin()">立即登录</a>';
+  document.getElementById('login-error').classList.remove('show');
+  document.getElementById('login-password').value = '';
+}
+
+function switchToLogin() {
+  document.getElementById('login-btn').textContent = '登录';
+  document.getElementById('login-btn').onclick = handleLogin;
+  document.getElementById('login-subtitle').textContent = '请登录或注册';
+  document.getElementById('login-switch').innerHTML = '还没有账号？<a href="javascript:void(0)" onclick="switchToRegister()">立即注册</a>';
+  document.getElementById('login-error').classList.remove('show');
+  document.getElementById('login-password').value = '';
+}
+
+function renderUserList() {
+  const users = getUsers();
+  const container = document.getElementById('user-list-container');
+  const section = document.getElementById('user-list-section');
+  if (users.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = 'block';
+  container.innerHTML = users.map(u => {
+    return '<div class="user-chip" onclick="quickLogin(\'' + esc(u.username) + '\')">' +
+      '<span class="name">👤 ' + esc(u.username) + '</span>' +
+      '<span class="delete" onclick="event.stopPropagation();deleteUser(\'' + esc(u.username) + '\')">×</span>' +
+      '</div>';
+  }).join('');
+}
+
+function quickLogin(username) {
+  document.getElementById('login-username').value = username;
+  document.getElementById('login-password').focus();
+  document.getElementById('login-error').classList.remove('show');
+}
+
+function deleteUser(username) {
+  if (!confirm('确定删除账号 "' + username + '"？该账号的所有数据也将被删除。')) return;
+  let users = getUsers();
+  users = users.filter(u => u.username !== username);
+  saveUsers(users);
+  localStorage.removeItem('work_task_list_v5_' + username);
+  localStorage.removeItem('work_project_resources_' + username);
+  localStorage.removeItem('github_token_' + username);
+  localStorage.removeItem('github_gist_id_' + username);
+  localStorage.removeItem('github_last_sync_' + username);
+  renderUserList();
+}
+
+function toggleUserDropdown(event) {
+  event.stopPropagation();
+  document.getElementById('user-dropdown-menu').classList.toggle('show');
+}
+
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('user-dropdown-menu');
+  if (menu && !e.target.closest('.user-dropdown')) {
+    menu.classList.remove('show');
+  }
+});
+
 // 初始化
 const cloudSync = {
-  token: localStorage.getItem('github_token') || '',
-  gistId: localStorage.getItem('github_gist_id') || '',
-  lastSync: localStorage.getItem('github_last_sync') || '',
+  getToken() { return currentUser ? localStorage.getItem('github_token_' + currentUser) || '' : ''; },
+  getGistId() { return currentUser ? localStorage.getItem('github_gist_id_' + currentUser) || '' : ''; },
+  getLastSync() { return currentUser ? localStorage.getItem('github_last_sync_' + currentUser) || '' : ''; },
+  setToken(v) { if (currentUser) localStorage.setItem('github_token_' + currentUser, v); },
+  setGistId(v) { if (currentUser) localStorage.setItem('github_gist_id_' + currentUser, v); },
+  setLastSync(v) { if (currentUser) localStorage.setItem('github_last_sync_' + currentUser, v); },
   apiBase: 'https://api.github.com',
+  get token() { return this.getToken(); },
+  get gistId() { return this.getGistId(); },
+  get lastSync() { return this.getLastSync(); },
 
   init() {
     this.updateUI();
@@ -1513,8 +1795,7 @@ const cloudSync = {
         render();
       }
 
-      this.lastSync = new Date().toLocaleString();
-      localStorage.setItem('github_last_sync', this.lastSync);
+      this.setLastSync(new Date().toLocaleString());
       this.updateUI();
     } catch (err) {
       console.error('云同步拉取失败:', err);
@@ -1543,8 +1824,7 @@ const cloudSync = {
         })
       });
       if (!res.ok) throw new Error('推送失败');
-      this.lastSync = new Date().toLocaleString();
-      localStorage.setItem('github_last_sync', this.lastSync);
+      this.setLastSync(new Date().toLocaleString());
       this.updateUI();
     } catch (err) {
       console.error('云同步推送失败:', err);
@@ -1555,8 +1835,8 @@ const cloudSync = {
 };
 
 function openSyncModal() {
-  const token = localStorage.getItem('github_token') || '';
-  const gistId = localStorage.getItem('github_gist_id') || '';
+  const token = cloudSync.getToken();
+  const gistId = cloudSync.getGistId();
   document.getElementById('sync-token').value = token;
   const info = document.getElementById('sync-info');
   const removeBtn = document.getElementById('sync-remove-btn');
@@ -1564,7 +1844,7 @@ function openSyncModal() {
   if (token && gistId) {
     info.style.display = 'flex';
     document.getElementById('sync-gist-id').textContent = gistId.substring(0, 8) + '...';
-    document.getElementById('sync-last-time').textContent = localStorage.getItem('github_last_sync') || '-';
+    document.getElementById('sync-last-time').textContent = cloudSync.getLastSync() || '-';
     removeBtn.style.display = 'inline-flex';
     unconfigured.style.display = 'none';
   } else {
@@ -1585,14 +1865,11 @@ async function saveSyncConfig() {
   document.getElementById('sync-status-text').textContent = '验证中...';
   try {
     await cloudSync.testToken(token);
-    let gistId = localStorage.getItem('github_gist_id');
+    let gistId = cloudSync.getGistId();
     if (!gistId) {
       gistId = await cloudSync.createGist(token);
     }
-    localStorage.setItem('github_token', token);
-    localStorage.setItem('github_gist_id', gistId);
-    cloudSync.token = token;
-    cloudSync.gistId = gistId;
+    cloudSync.setToken(token); cloudSync.setGistId(gistId);
     await cloudSync.push();
     cloudSync.updateUI();
     alert('配置成功！数据已同步到云端。');
@@ -1605,19 +1882,29 @@ async function saveSyncConfig() {
 
 function removeSync() {
   if (!confirm('确定移除云同步？本地数据不会删除，但将不再自动同步到云端。')) return;
-  localStorage.removeItem('github_token');
-  localStorage.removeItem('github_gist_id');
-  localStorage.removeItem('github_last_sync');
-  cloudSync.token = '';
-  cloudSync.gistId = '';
-  cloudSync.lastSync = '';
+  if (currentUser) {
+    localStorage.removeItem('github_token_' + currentUser);
+    localStorage.removeItem('github_gist_id_' + currentUser);
+    localStorage.removeItem('github_last_sync_' + currentUser);
+  }
+  // cloudSync getters are dynamic
   cloudSync.updateUI();
   closeSyncModal();
 }
 
+
+
 // 初始化
-cloudSync.init();
-load();
+updateUserKeys();
+if (currentUser) {
+  document.getElementById('login-overlay').classList.add('hidden');
+  document.getElementById('user-avatar').textContent = currentUser.charAt(0).toUpperCase();
+  document.getElementById('dropdown-username').textContent = '👤 ' + currentUser;
+  cloudSync.init();
+  load();
+} else {
+  renderUserList();
+}
 </script>
 
 </body>
