@@ -62,7 +62,12 @@
 
   /* 项目卡片 */
   .project-list { display: flex; flex-direction: column; gap: 16px; }
-  .project-card { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden; }
+  .card-toggle-btn { cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 16px; color: #aab; transition: all 0.2s; user-select: none; margin-left: 4px; }
+  .card-toggle-btn:hover { background: #f0f2ff; color: #667eea; }
+  .card-toggle-btn.collapsed { transform: rotate(-90deg); color: #667eea; }
+  .card-body { animation: bodyFade 0.2s ease; }
+  @keyframes bodyFade { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+  .project-card { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden; display: flex; flex-direction: column; }
   .project-header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; background: linear-gradient(90deg, #f8f9ff 0%, #fff 100%); border-bottom: 1px solid #f0f0f0; cursor: grab; user-select: none; }
   .project-header:active { cursor: grabbing; }
   .drag-handle { color: #aab; font-size: 18px; cursor: grab; padding: 4px 8px; border-radius: 6px; transition: all 0.2s; }
@@ -711,18 +716,22 @@ function render() {
         }).join('');
       }
       const expanded = localStorage.getItem('resource_expanded_' + currentListId + '_' + projectName) === 'true';
+      const cardCollapsed = localStorage.getItem('card_collapsed_' + currentListId + '_' + projectName) === 'true';
       card.innerHTML = '<div class="project-header">' +
         '<div class="drag-handle">⋮⋮</div>' +
         '<div class="project-title">' + esc(projectName) + '</div>' +
         '<div class="project-meta"><span class="project-badge">' + stats.total + ' 任务</span><span class="project-progress" style="color:#27ae60">' + stats.done + ' 完成</span><span class="project-progress" style="color:#d35400">' + stats.inProgress + ' 进行中</span><span class="project-progress" style="color:#c0392b">' + stats.todo + ' 待办</span></div>' +
+        '<div class="card-toggle-btn ' + (cardCollapsed ? 'collapsed' : '') + '" onclick="event.stopPropagation();toggleCardCollapse(\'' + esc(projectName) + '\')" title="折叠/展开">▼</div>' +
         '</div>' +
+        (cardCollapsed ? '' : '<div class="card-body">' +
         '<table class="task-table-inner"><thead><tr><th style="width:40px"></th><th>任务</th><th>状态</th><th>优先级</th><th>进展/备注</th><th>日期</th><th>预计完成</th><th>实际完成</th><th>操作</th></tr></thead><tbody>' + tasksHtml + '</tbody></table>' +
         '<div class="resource-box"><div class="resource-box-header" onclick="toggleResourceBox(\'' + esc(projectName) + '\')">' +
         '<div class="resource-box-header-left"><span class="icon">📁</span><span>项目资料</span><span class="count">' + resources.length + '</span></div>' +
         '<div style="display:flex;gap:10px;align-items:center;"><button class="btn btn-xs btn-primary" style="padding:4px 10px;font-size:11px;" onclick="event.stopPropagation();openResourceModal(\'' + esc(projectName) + '\')">+ 添加文档</button><span class="resource-toggle ' + (expanded ? 'expanded' : '') + '">▼</span></div>' +
         '</div>' +
         '<div class="resource-box-body ' + (expanded ? 'expanded' : '') + '"><div class="resource-toolbar"><button class="btn btn-xs btn-secondary" onclick="openResourceModal(\'' + esc(projectName) + '\')">📝 添加文档</button></div>' +
-        '<div class="resource-list">' + resourcesHtml + '</div></div></div>';
+        '<div class="resource-list">' + resourcesHtml + '</div></div></div>' +
+        '</div>');
       listEl.appendChild(card);
     });
   }
@@ -859,6 +868,11 @@ function handleCardDrop(e) {
   if (!source || source === target) return;
   const cards = [...document.querySelectorAll('.project-card')];
   const visibleProjects = cards.map(c => c.dataset.project);
+  const sourceIdx = visibleProjects.indexOf(source);
+  const targetIdx = visibleProjects.indexOf(target);
+  if (sourceIdx === -1 || targetIdx === -1) return;
+  visibleProjects.splice(sourceIdx, 1);
+  visibleProjects.splice(targetIdx, 0, source);
   const allProjects = [...new Set(tasks.map(t => t.project))];
   const hiddenProjects = allProjects.filter(p => !visibleProjects.includes(p));
   const newTasks = []; visibleProjects.forEach(p => newTasks.push(...tasks.filter(t => t.project === p))); hiddenProjects.forEach(p => newTasks.push(...tasks.filter(t => t.project === p)));
@@ -913,6 +927,13 @@ function closeHistory() { if (activeHistoryPopover) { activeHistoryPopover.remov
 document.addEventListener('click', (e) => { if (activeHistoryPopover && !activeHistoryPopover.contains(e.target) && !e.target.closest('.btn-link')) { closeHistory(); } });
 
 // ========== 资源箱 ==========
+function toggleCardCollapse(projectName) {
+  const key = 'card_collapsed_' + currentListId + '_' + projectName;
+  const current = localStorage.getItem(key) === 'true';
+  localStorage.setItem(key, !current);
+  render();
+}
+
 function toggleResourceBox(projectName) { const key = 'resource_expanded_' + currentListId + '_' + projectName; const current = localStorage.getItem(key) === 'true'; localStorage.setItem(key, !current); render(); }
 
 function openResourceModal(projectName, docIdx) {
