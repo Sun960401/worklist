@@ -3,61 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>工作清单管理</title>
+<title>清单管理</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-    background: #f5f7fa;
-    color: #333;
-    line-height: 1.6;
-  }
-  .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-  header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 30px 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; }
+
+  /* 布局 */
+  .app-layout { display: flex; min-height: 100vh; }
+  .sidebar { width: 220px; flex-shrink: 0; background: linear-gradient(180deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 0; display: flex; flex-direction: column; }
+  .sidebar-brand { padding: 0 20px 16px; font-size: 18px; font-weight: bold; }
+  .sidebar-divider { border-top: 1px solid rgba(255,255,255,0.2); margin: 10px 16px; }
+  .sidebar-section-title { padding: 8px 20px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
+  .list-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; margin: 2px 12px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 14px; user-select: none; }
+  .list-item:hover { background: rgba(255,255,255,0.15); }
+  .list-item.active { background: rgba(255,255,255,0.25); font-weight: 600; }
+  .list-item .list-icon { font-size: 16px; width: 24px; text-align: center; }
+  .list-item .list-name { flex: 1; }
+  .list-item .list-count { font-size: 11px; opacity: 0.7; background: rgba(255,255,255,0.2); padding: 1px 6px; border-radius: 10px; }
+  .list-item .list-menu { opacity: 0; font-size: 13px; padding: 2px 6px; border-radius: 4px; }
+  .list-item:hover .list-menu { opacity: 1; }
+  .sidebar-add-btn { margin: 10px 16px; padding: 10px 14px; border-radius: 8px; border: 1px dashed rgba(255,255,255,0.4); cursor: pointer; font-size: 13px; text-align: center; transition: all 0.2s; }
+  .sidebar-add-btn:hover { border-color: white; background: rgba(255,255,255,0.1); }
+  .sidebar-footer { margin-top: auto; padding: 12px 20px; font-size: 11px; opacity: 0.6; }
+  .main-content { flex: 1; overflow: auto; padding: 20px; }
+
+  /* 头部 */
+  .container { max-width: 1400px; margin: 0 auto; }
+  header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
   header h1 { font-size: 28px; margin-bottom: 8px; }
   header p { opacity: 0.9; font-size: 14px; }
 
-  .stats-bar {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-    margin-bottom: 20px;
-  }
-  .stat-card {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    text-align: center;
-  }
+  /* 统计栏 */
+  .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+  .stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center; }
   .stat-card .number { font-size: 32px; font-weight: bold; color: #667eea; }
   .stat-card .label { font-size: 13px; color: #888; margin-top: 4px; }
 
-  .toolbar {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  .btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
+  /* 工具栏 */
+  .toolbar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+  .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
   .btn-primary { background: #667eea; color: white; }
   .btn-primary:hover { background: #5a6fd6; transform: translateY(-1px); }
   .btn-secondary { background: white; color: #667eea; border: 1px solid #667eea; }
@@ -66,51 +50,20 @@
   .btn-danger:hover { background: #fdf2f2; }
   .btn-success { background: #fff; color: #27ae60; border: 1px solid #27ae60; }
   .btn-success:hover { background: #e8f8f0; }
-  .btn-link { background: none; border: none; color: #667eea; font-size: 12px; cursor: pointer; text-decoration: underline; padding: 0; }
-  .btn-link:hover { color: #5a6fd6; }
   .btn-sm { padding: 6px 12px; font-size: 12px; }
   .btn-xs { padding: 4px 10px; font-size: 11px; }
-
-  input, select, textarea {
-    padding: 10px 14px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-    font-family: inherit;
-  }
-  input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
-  }
-
+  .btn-link { background: none; border: none; color: #667eea; font-size: 12px; cursor: pointer; text-decoration: underline; padding: 0; }
+  .btn-link:hover { color: #5a6fd6; }
+  input, select, textarea { padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
   .filter-group { display: flex; gap: 8px; align-items: center; }
   .filter-group label { font-size: 13px; color: #666; }
-  .filter-group select { min-width: 120px; }
   .search-box { min-width: 200px; }
 
-  /* ===== 项目卡片 ===== */
+  /* 项目卡片 */
   .project-list { display: flex; flex-direction: column; gap: 16px; }
-  .project-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    overflow: hidden;
-    transition: box-shadow 0.2s, transform 0.15s;
-  }
-  .project-card.dragging { opacity: 0.6; box-shadow: 0 8px 30px rgba(102,126,234,0.25); transform: scale(1.01); }
-  .project-card.drag-over { border: 2px dashed #667eea; }
-
-  .project-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 20px;
-    background: linear-gradient(90deg, #f8f9ff 0%, #fff 100%);
-    border-bottom: 1px solid #f0f0f0;
-    cursor: grab;
-    user-select: none;
-  }
+  .project-card { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden; }
+  .project-header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; background: linear-gradient(90deg, #f8f9ff 0%, #fff 100%); border-bottom: 1px solid #f0f0f0; cursor: grab; user-select: none; }
   .project-header:active { cursor: grabbing; }
   .drag-handle { color: #aab; font-size: 18px; cursor: grab; padding: 4px 8px; border-radius: 6px; transition: all 0.2s; }
   .drag-handle:hover { color: #667eea; background: #f0f2ff; }
@@ -119,309 +72,77 @@
   .project-badge { font-size: 12px; padding: 2px 10px; border-radius: 20px; background: #f0f2ff; color: #667eea; font-weight: 500; }
   .project-progress { font-size: 12px; color: #888; }
 
-  /* ===== 卡片内任务表格 ===== */
+  /* 任务表格 */
   .task-table-inner { width: 100%; border-collapse: collapse; }
   .task-table-inner thead { background: #fafbfc; }
-  .task-table-inner th {
-    padding: 10px 14px; text-align: left; font-size: 12px; font-weight: 600;
-    color: #888; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #eee;
-  }
-  .task-table-inner td {
-    padding: 12px 14px; border-bottom: 1px solid #f5f5f5; font-size: 14px; vertical-align: top;
-  }
+  .task-table-inner th { padding: 10px 14px; text-align: left; font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #eee; }
+  .task-table-inner td { padding: 12px 14px; border-bottom: 1px solid #f5f5f5; font-size: 14px; vertical-align: top; }
   .task-table-inner tr:hover { background: #fafbfc; }
   .task-table-inner tr:last-child td { border-bottom: none; }
-
-  .task-row { cursor: default; }
-  .task-row.dragging-row { opacity: 0.5; background: #f0f2ff; }
-  .task-row.drag-over-row { border-top: 2px solid #667eea; }
   .task-row .task-drag-handle { color: #ccc; font-size: 14px; cursor: grab; padding: 2px 6px; border-radius: 4px; display: inline-block; }
   .task-row .task-drag-handle:hover { color: #667eea; background: #f0f2ff; }
   .task-row .task-drag-handle:active { cursor: grabbing; }
-
-  .status-badge {
-    display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
-    cursor: pointer; user-select: none;
-  }
+  .task-row.dragging-row { opacity: 0.5; background: #f0f2ff; }
+  .task-row.drag-over-row { border-top: 2px solid #667eea; }
+  .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; user-select: none; }
   .status-待办 { background: #ffeaea; color: #c0392b; }
   .status-进行中 { background: #fff4e0; color: #d35400; }
   .status-已完成 { background: #e8f8f0; color: #27ae60; }
   .status-阻塞暂停 { background: #e8f0fe; color: #2980b9; }
   .status-取消 { background: #eee; color: #7f8c8d; }
-
-  .priority-badge {
-    display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 500;
-  }
+  .priority-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
   .priority-高 { background: #ffeaea; color: #c0392b; }
   .priority-中 { background: #fff8e0; color: #b7950b; }
   .priority-低 { background: #e8f8f0; color: #27ae60; }
-
   .actions { display: flex; gap: 6px; flex-wrap: wrap; }
   .actions button { padding: 4px 10px; font-size: 12px; }
-
   .note-text { color: #555; font-size: 13px; line-height: 1.5; }
   .note-date { font-weight: 600; color: #667eea; font-size: 12px; }
 
-  /* ===== 项目资料箱 ===== */
-  .resource-box {
-    border-top: 1px solid #f0f0f0;
-    background: #fafbfc;
-  }
-  .resource-box-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 20px;
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.2s;
-  }
+  /* 项目资料箱 */
+  .resource-box { border-top: 1px solid #f0f0f0; background: #fafbfc; }
+  .resource-box-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; cursor: pointer; user-select: none; transition: background 0.2s; }
   .resource-box-header:hover { background: #f0f2ff; }
-  .resource-box-header-left {
-    display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #667eea;
-  }
+  .resource-box-header-left { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #667eea; }
   .resource-box-header-left .icon { font-size: 16px; }
-  .resource-box-header-left .count {
-    font-size: 11px; color: #888; font-weight: 400; background: #eee; padding: 1px 8px; border-radius: 10px;
-  }
+  .resource-box-header-left .count { font-size: 11px; color: #888; font-weight: 400; background: #eee; padding: 1px 8px; border-radius: 10px; }
   .resource-toggle { font-size: 12px; color: #667eea; transition: transform 0.2s; }
   .resource-toggle.expanded { transform: rotate(180deg); }
-
-  .resource-box-body {
-    padding: 0 20px 16px;
-    display: none;
-  }
+  .resource-box-body { padding: 0 20px 16px; display: none; }
   .resource-box-body.expanded { display: block; }
-
-  .resource-list {
-    display: flex; flex-direction: column; gap: 10px;
-  }
-  .doc-card {
-    background: white;
-    border-radius: 10px;
-    border: 1px solid #eee;
-    padding: 14px 16px;
-    transition: all 0.2s;
-    cursor: pointer;
-  }
-  .doc-card:hover {
-    border-color: #667eea;
-    box-shadow: 0 2px 12px rgba(102,126,234,0.08);
-  }
-  .doc-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-  .doc-card-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
-    flex: 1;
-  }
-  .doc-card-date {
-    font-size: 11px;
-    color: #aaa;
-    margin-left: 10px;
-  }
-  .doc-card-preview {
-    font-size: 12px;
-    color: #666;
-    line-height: 1.5;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-  }
-  .doc-card-preview img {
-    max-width: 60px;
-    max-height: 40px;
-    border-radius: 4px;
-    vertical-align: middle;
-    margin-right: 4px;
-  }
-  .doc-card-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-  }
-  .doc-card-actions button {
-    font-size: 11px;
-    padding: 3px 10px;
-  }
-  .resource-empty {
-    text-align: center; padding: 24px; color: #bbb; font-size: 13px;
-  }
+  .resource-toolbar { display: flex; gap: 8px; margin-bottom: 12px; padding-top: 4px; }
+  .doc-card { background: white; border-radius: 10px; border: 1px solid #eee; padding: 14px 16px; transition: all 0.2s; cursor: pointer; }
+  .doc-card:hover { border-color: #667eea; box-shadow: 0 2px 12px rgba(102,126,234,0.08); }
+  .doc-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .doc-card-title { font-size: 14px; font-weight: 600; color: #333; flex: 1; }
+  .doc-card-date { font-size: 11px; color: #aaa; margin-left: 10px; }
+  .doc-card-preview { font-size: 12px; color: #666; line-height: 1.5; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+  .doc-card-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .doc-card-actions button { font-size: 11px; padding: 3px 10px; }
+  .resource-empty { text-align: center; padding: 24px; color: #bbb; font-size: 13px; }
   .resource-empty .icon { font-size: 32px; margin-bottom: 8px; }
 
-  /* ===== 富文本编辑器 ===== */
-  .rte-editor {
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    overflow: hidden;
-    background: white;
-  }
-  .rte-toolbar {
-    display: flex;
-    gap: 4px;
-    padding: 8px 12px;
-    background: #f8f9fa;
-    border-bottom: 1px solid #eee;
-    flex-wrap: wrap;
-  }
-  .rte-toolbar button {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.15s;
-    color: #555;
-  }
-  .rte-toolbar button:hover {
-    border-color: #667eea;
-    color: #667eea;
-    background: #f0f2ff;
-  }
-  .rte-toolbar button.active {
-    background: #667eea;
-    color: white;
-    border-color: #667eea;
-  }
-  .rte-toolbar .sep {
-    width: 1px;
-    background: #ddd;
-    margin: 2px 4px;
-  }
-  .rte-content {
-    min-height: 280px;
-    max-height: 400px;
-    overflow-y: auto;
-    padding: 16px;
-    font-size: 14px;
-    line-height: 1.7;
-    color: #333;
-  }
+  /* 富文本编辑器 */
+  .rte-editor { border: 1px solid #ddd; border-radius: 10px; overflow: hidden; background: white; }
+  .rte-toolbar { display: flex; gap: 4px; padding: 8px 12px; background: #f8f9fa; border-bottom: 1px solid #eee; flex-wrap: wrap; }
+  .rte-toolbar button { background: white; border: 1px solid #ddd; border-radius: 6px; padding: 6px 10px; font-size: 13px; cursor: pointer; transition: all 0.15s; color: #555; }
+  .rte-toolbar button:hover { border-color: #667eea; color: #667eea; background: #f0f2ff; }
+  .rte-toolbar button.active { background: #667eea; color: white; border-color: #667eea; }
+  .rte-toolbar .sep { width: 1px; background: #ddd; margin: 2px 4px; }
+  .rte-content { min-height: 280px; max-height: 400px; overflow-y: auto; padding: 16px; font-size: 14px; line-height: 1.7; color: #333; }
   .rte-content:focus { outline: none; }
-  .rte-content img {
-    max-width: 100%;
-    border-radius: 8px;
-    margin: 8px 0;
-  }
+  .rte-content img { max-width: 100%; border-radius: 8px; margin: 8px 0; }
   .rte-content a { color: #667eea; text-decoration: underline; }
   .rte-content h1 { font-size: 20px; margin: 12px 0 8px; color: #333; }
   .rte-content h2 { font-size: 17px; margin: 10px 0 6px; color: #444; }
   .rte-content ul, .rte-content ol { margin: 8px 0; padding-left: 24px; }
-  .rte-content blockquote {
-    border-left: 3px solid #667eea;
-    padding-left: 12px;
-    margin: 8px 0;
-    color: #666;
-    background: #f8f9ff;
-    padding: 8px 12px;
-    border-radius: 0 6px 6px 0;
-  }
+  .rte-content blockquote { border-left: 3px solid #667eea; padding-left: 12px; margin: 8px 0; color: #666; background: #f8f9ff; padding: 8px 12px; border-radius: 0 6px 6px 0; }
+  .image-preview { max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid #eee; margin-top: 8px; }
 
-  
-  
-  /* ===== 登录/注册界面 ===== */
-  .login-overlay {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: flex; justify-content: center; align-items: center;
-    z-index: 3000; padding: 20px;
-  }
-  .login-overlay.hidden { display: none; }
-  .login-card {
-    background: white; border-radius: 20px; padding: 40px;
-    width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    animation: loginSlide 0.4s ease;
-  }
-  @keyframes loginSlide { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-  .login-card h2 { text-align: center; margin-bottom: 8px; font-size: 24px; color: #333; }
-  .login-card .subtitle { text-align: center; color: #888; font-size: 14px; margin-bottom: 28px; }
-  .login-card .form-group { margin-bottom: 18px; }
-  .login-card .form-group label { font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; display: block; }
-  .login-card .form-group input { width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; }
-  .login-card .form-group input:focus { border-color: #667eea; outline: none; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
-  .login-card .btn-full { width: 100%; justify-content: center; padding: 14px; font-size: 15px; margin-top: 4px; }
-  .login-card .switch-mode { text-align: center; margin-top: 16px; font-size: 13px; color: #666; }
-  .login-card .switch-mode a { color: #667eea; cursor: pointer; font-weight: 600; }
-  .login-card .switch-mode a:hover { text-decoration: underline; }
-  .login-card .error-msg { color: #e74c3c; font-size: 13px; text-align: center; margin-top: 8px; display: none; }
-  .login-card .error-msg.show { display: block; }
-  .login-card .user-list { margin-top: 16px; border-top: 1px solid #eee; padding-top: 16px; }
-  .login-card .user-list h4 { font-size: 13px; color: #888; margin-bottom: 10px; }
-  .login-card .user-chip { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 8px; background: #f8f9ff; margin-bottom: 6px; cursor: pointer; transition: all 0.2s; }
-  .login-card .user-chip:hover { background: #f0f2ff; }
-  .login-card .user-chip .name { font-size: 14px; font-weight: 500; color: #333; }
-  .login-card .user-chip .delete { color: #ccc; font-size: 16px; padding: 2px 6px; border-radius: 4px; }
-  .login-card .user-chip .delete:hover { color: #e74c3c; background: #ffeaea; }
-
-  /* ===== 用户信息栏 ===== */
-  .user-bar { display: flex; align-items: center; gap: 8px; }
-  .user-avatar {
-    width: 32px; height: 32px; border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white; display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 600; cursor: pointer;
-  }
-  .user-name { font-size: 14px; color: #555; font-weight: 500; }
-  .user-dropdown { position: relative; }
-  .user-dropdown-menu {
-    position: absolute; top: 100%; right: 0; margin-top: 8px;
-    background: white; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    padding: 8px 0; min-width: 140px; display: none; z-index: 100;
-  }
-  .user-dropdown-menu.show { display: block; }
-  .user-dropdown-menu .item { padding: 8px 16px; font-size: 13px; color: #333; cursor: pointer; transition: all 0.15s; }
-  .user-dropdown-menu .item:hover { background: #f0f2ff; color: #667eea; }
-  .user-dropdown-menu .divider { border-top: 1px solid #eee; margin: 4px 0; }
-
-/* ===== 云同步状态 ===== */
-  .sync-status {
-    display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #888; padding: 6px 12px;
-    background: white; border-radius: 8px; border: 1px solid #eee; cursor: pointer; transition: all 0.2s;
-  }
-  .sync-status:hover { border-color: #667eea; color: #667eea; }
-  .sync-status.synced { color: #27ae60; border-color: #c6efce; }
-  .sync-status.syncing { color: #d35400; border-color: #ffeb9c; }
-  .sync-status.error { color: #e74c3c; border-color: #ffc7ce; }
-  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
-  .sync-status.synced .sync-dot { background: #27ae60; }
-  .sync-status.syncing .sync-dot { background: #d35400; animation: pulse 1s infinite; }
-  .sync-status.error .sync-dot { background: #e74c3c; }
-  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-  .sync-settings {
-    background: #f8f9ff; border-radius: 10px; padding: 16px; margin-bottom: 16px;
-  }
-  .sync-settings h4 { font-size: 14px; color: #667eea; margin-bottom: 10px; }
-  .sync-settings p { font-size: 12px; color: #888; margin: 4px 0; line-height: 1.5; }
-  .sync-settings .token-input { font-family: monospace; font-size: 12px; }
-  .sync-info { display: flex; gap: 20px; font-size: 13px; color: #666; margin-top: 8px; }
-  .sync-info-item { display: flex; align-items: center; gap: 6px; }
-
-  .step-list { font-size: 12px; color: #666; line-height: 1.8; margin: 8px 0; padding-left: 16px; }
-  .step-list li { margin-bottom: 4px; }
-  .step-list code { background: #eee; padding: 1px 6px; border-radius: 4px; font-family: monospace; }
-  .step-list a { color: #667eea; }
-
-/* ===== Modal ===== */
-  .modal-overlay {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5); display: none; justify-content: center;
-    align-items: center; z-index: 1000; padding: 20px;
-  }
+  /* Modal */
+  .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
   .modal-overlay.active { display: flex; }
-  .modal {
-    background: white; border-radius: 16px; width: 100%; max-width: 600px;
-    max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    animation: modalSlide 0.3s ease;
-  }
+  .modal { background: white; border-radius: 16px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: modalSlide 0.3s ease; }
   @keyframes modalSlide { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   .modal-header { padding: 24px 24px 0; display: flex; justify-content: space-between; align-items: center; }
   .modal-header h2 { font-size: 20px; }
@@ -434,71 +155,60 @@
   .form-group textarea { resize: vertical; min-height: 80px; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .modal-footer { padding: 16px 24px 24px; display: flex; justify-content: flex-end; gap: 10px; }
-
-  .type-selector {
-    display: flex; gap: 8px; margin-bottom: 16px;
-  }
-  .type-option {
-    flex: 1; padding: 12px; border: 2px solid #eee; border-radius: 10px;
-    cursor: pointer; text-align: center; transition: all 0.2s;
-  }
+  .type-selector { display: flex; gap: 8px; margin-bottom: 16px; }
+  .type-option { flex: 1; padding: 12px; border: 2px solid #eee; border-radius: 10px; cursor: pointer; text-align: center; transition: all 0.2s; }
   .type-option:hover { border-color: #667eea; background: #f8f9ff; }
   .type-option.active { border-color: #667eea; background: #f0f2ff; }
   .type-option .type-icon { font-size: 20px; margin-bottom: 4px; }
   .type-option .type-label { font-size: 13px; color: #555; font-weight: 500; }
-
-  .image-preview {
-    max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid #eee; margin-top: 8px;
-  }
-
-  .update-history {
-    background: #fafbfc; border-radius: 8px; padding: 12px; margin-bottom: 16px; max-height: 200px; overflow-y: auto;
-  }
+  .update-history { background: #fafbfc; border-radius: 8px; padding: 12px; margin-bottom: 16px; max-height: 200px; overflow-y: auto; }
   .update-item { padding: 8px 0; border-bottom: 1px solid #eee; font-size: 13px; }
   .update-item:last-child { border-bottom: none; }
   .update-date { font-weight: 600; color: #667eea; margin-right: 8px; }
   .update-content { color: #555; }
-
-  .history-popover {
-    position: absolute; background: white; border-radius: 10px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.15); padding: 16px;
-    min-width: 320px; max-width: 400px; max-height: 300px; overflow-y: auto;
-    z-index: 100; border: 1px solid #eee;
-  }
-  .history-popover::before {
-    content: ''; position: absolute; bottom: -8px; left: 20px;
-    width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid white;
-  }
+  .history-popover { position: absolute; background: white; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); padding: 16px; min-width: 320px; max-width: 400px; max-height: 300px; overflow-y: auto; z-index: 100; border: 1px solid #eee; }
+  .history-popover::before { content: ''; position: absolute; bottom: -8px; left: 20px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid white; }
   .history-popover .pop-title { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
   .history-popover .pop-close { position: absolute; top: 10px; right: 12px; background: none; border: none; font-size: 18px; color: #999; cursor: pointer; }
   .history-popover .pop-close:hover { color: #333; }
-
-  .image-view-overlay {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center;
-    z-index: 2000; padding: 40px;
-  }
+  .image-view-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 40px; }
   .image-view-overlay.active { display: flex; }
   .image-view-overlay img { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
-  .image-view-close {
-    position: absolute; top: 20px; right: 30px; color: white; font-size: 36px;
-    cursor: pointer; background: none; border: none;
-  }
-
-  .empty-state {
-    text-align: center; padding: 60px 20px; color: #999;
-  }
+  .image-view-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 36px; cursor: pointer; background: none; border: none; }
+  .empty-state { text-align: center; padding: 60px 20px; color: #999; }
   .empty-state svg { width: 80px; height: 80px; margin-bottom: 16px; opacity: 0.4; }
   .empty-state h3 { font-size: 18px; margin-bottom: 8px; color: #666; }
+  .sync-status { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #888; padding: 6px 12px; background: white; border-radius: 8px; border: 1px solid #eee; cursor: pointer; transition: all 0.2s; }
+  .sync-status:hover { border-color: #667eea; color: #667eea; }
+  .sync-status.synced { color: #27ae60; border-color: #c6efce; }
+  .sync-status.syncing { color: #d35400; border-color: #ffeb9c; }
+  .sync-status.error { color: #e74c3c; border-color: #ffc7ce; }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
+  .sync-status.synced .sync-dot { background: #27ae60; }
+  .sync-status.syncing .sync-dot { background: #d35400; animation: pulse 1s infinite; }
+  .sync-status.error .sync-dot { background: #e74c3c; }
+  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+  .sync-settings { background: #f8f9ff; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+  .sync-settings h4 { font-size: 14px; color: #667eea; margin-bottom: 10px; }
+  .step-list { font-size: 12px; color: #666; line-height: 1.8; margin: 8px 0; padding-left: 16px; }
+  .step-list li { margin-bottom: 4px; }
+  .step-list code { background: #eee; padding: 1px 6px; border-radius: 4px; font-family: monospace; }
+  .step-list a { color: #667eea; }
+  .sync-info { display: flex; gap: 20px; font-size: 13px; color: #666; margin-top: 8px; }
+  .sync-info-item { display: flex; align-items: center; gap: 6px; }
 
   @media (max-width: 768px) {
+    .sidebar { width: 60px; padding: 10px 0; }
+    .sidebar-brand, .sidebar-section-title, .list-name, .list-count, .sidebar-add-btn, .sidebar-footer { display: none; }
+    .list-item { padding: 10px 8px; margin: 2px 4px; justify-content: center; }
+    .list-item .list-menu { display: none; }
     .stats-bar { grid-template-columns: repeat(2, 1fr); }
     .toolbar { flex-direction: column; align-items: stretch; }
     .form-row { grid-template-columns: 1fr; }
     .project-header { flex-wrap: wrap; }
     .project-meta { width: 100%; justify-content: flex-end; margin-top: 4px; }
     .task-table-inner th, .task-table-inner td { padding: 8px 10px; font-size: 12px; }
-    .container { padding: 10px; }
+    .main-content { padding: 10px; }
     header { padding: 20px 15px; }
     header h1 { font-size: 22px; }
   }
@@ -506,93 +216,87 @@
 </head>
 <body>
 
+<div class="app-layout">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-brand"><span class="icon">📋</span>清单</div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section-title">我的清单</div>
+    <div id="list-container"></div>
+    <div class="sidebar-add-btn" onclick="openListModal()">➕ 添加新清单</div>
+    <div class="sidebar-footer">v2.0</div>
+  </div>
+  <div class="main-content">
+    <div class="container">
+      <header>
+        <h1 id="current-list-title">📋 工作清单</h1>
+        <p>管理工作任务，跟踪项目进度</p>
+      </header>
 
-<!-- 登录/注册界面 -->
-<div class="login-overlay" id="login-overlay">
-  <div class="login-card" id="login-card">
-    <h2>📋 工作清单</h2>
-    <div class="subtitle" id="login-subtitle">请登录或注册</div>
-    <div class="form-group">
-      <label>账号</label>
-      <input type="text" id="login-username" placeholder="输入账号" autocomplete="off">
-    </div>
-    <div class="form-group">
-      <label>密码</label>
-      <input type="password" id="login-password" placeholder="输入密码" autocomplete="off">
-    </div>
-    <div class="error-msg" id="login-error">账号或密码错误</div>
-    <button class="btn btn-primary btn-full" id="login-btn" onclick="handleLogin()">登录</button>
-    <div class="switch-mode" id="login-switch">
-      还没有账号？<a href="javascript:void(0)" onclick="switchToRegister()">立即注册</a>
-    </div>
-    <div class="user-list" id="user-list-section" style="display:none;">
-      <h4>👤 快速切换</h4>
-      <div id="user-list-container"></div>
+      <div class="stats-bar">
+        <div class="stat-card"><div class="number" id="stat-total">0</div><div class="label">全部任务</div></div>
+        <div class="stat-card"><div class="number" id="stat-todo">0</div><div class="label">待办</div></div>
+        <div class="stat-card"><div class="number" id="stat-progress">0</div><div class="label">进行中</div></div>
+        <div class="stat-card"><div class="number" id="stat-done">0</div><div class="label">已完成</div></div>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="openModal()">➕ 新增任务</button>
+        <div class="filter-group">
+          <label>筛选状态：</label>
+          <select id="filter-status" onchange="render()">
+            <option value="">全部状态</option>
+            <option value="待办">待办</option>
+            <option value="进行中">进行中</option>
+            <option value="已完成">已完成</option>
+            <option value="阻塞/暂停">阻塞/暂停</option>
+            <option value="取消">取消</option>
+          </select>
+        </div>
+        <input type="text" class="search-box" id="search-input" placeholder="🔍 搜索项目或任务..." oninput="render()">
+        <button class="btn btn-secondary btn-sm" onclick="exportData()">📥 导出</button>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('import-file').click()">📤 导入</button>
+        <input type="file" id="import-file" style="display:none" accept=".json" onchange="importData(event)">
+        <button class="btn btn-danger btn-sm" onclick="clearAll()">🗑️ 清空</button>
+        <div id="sync-status-btn" class="sync-status" onclick="openSyncModal()" title="点击配置云同步">
+          <span class="sync-dot"></span><span id="sync-status-text">未配置</span>
+        </div>
+      </div>
+
+      <div id="project-list" class="project-list"></div>
+
+      <div id="empty-state" class="empty-state" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        <h3>暂无任务</h3>
+        <p>点击「新增任务」开始记录</p>
+      </div>
     </div>
   </div>
 </div>
 
-<div class="container">
-  <header>
-    <h1>📋 工作清单</h1>
-    <p>管理工作任务，跟踪项目进度 · 拖拽项目卡片调整顺序 · 拖拽任务行调整顺序</p>
-  </header>
-
-  <div class="stats-bar">
-    <div class="stat-card"><div class="number" id="stat-total">0</div><div class="label">全部任务</div></div>
-    <div class="stat-card"><div class="number" id="stat-todo">0</div><div class="label">待办</div></div>
-    <div class="stat-card"><div class="number" id="stat-progress">0</div><div class="label">进行中</div></div>
-    <div class="stat-card"><div class="number" id="stat-done">0</div><div class="label">已完成</div></div>
-  </div>
-
-  <div class="toolbar">
-    <button class="btn btn-primary" onclick="openModal()">➕ 新增任务</button>
-    <div class="filter-group">
-      <label>筛选状态：</label>
-      <select id="filter-status" onchange="render()">
-        <option value="">全部状态</option>
-        <option value="待办">待办</option>
-        <option value="进行中">进行中</option>
-        <option value="已完成">已完成</option>
-        <option value="阻塞/暂停">阻塞/暂停</option>
-        <option value="取消">取消</option>
-      </select>
+<!-- 添加/编辑清单 Modal -->
+<div class="modal-overlay" id="list-modal">
+  <div class="modal" style="max-width: 400px;">
+    <div class="modal-header">
+      <h2 id="list-modal-title">添加清单</h2>
+      <button class="modal-close" onclick="closeListModal()">&times;</button>
     </div>
-    <input type="text" class="search-box" id="search-input" placeholder="🔍 搜索项目或任务..." oninput="render()">
-    <button class="btn btn-secondary btn-sm" onclick="exportData()">📥 导出</button>
-    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('import-file').click()">📤 导入</button>
-    <input type="file" id="import-file" style="display:none" accept=".json" onchange="importData(event)">
-    <button class="btn btn-danger btn-sm" onclick="clearAll()">🗑️ 清空</button>
-
-    <div class="user-bar">
-      <div class="user-dropdown" onclick="toggleUserDropdown(event)">
-        <div class="user-avatar" id="user-avatar">?</div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>清单名称</label>
+        <input type="text" id="list-name-input" placeholder="例如：心愿清单、锻炼计划...">
       </div>
-      <div class="user-dropdown-menu" id="user-dropdown-menu">
-        <div class="item" style="font-weight:600;" id="dropdown-username">用户</div>
-        <div class="divider"></div>
-        <div class="item" onclick="openSyncModal()">☁️ 云同步设置</div>
-        <div class="item" onclick="exportData()">📥 导出数据</div>
-        <div class="item" onclick="document.getElementById('import-file').click()">📤 导入数据</div>
-        <div class="divider"></div>
-        <div class="item" onclick="logout()" style="color:#e74c3c;">🚪 退出登录</div>
+      <div class="form-group">
+        <label>图标</label>
+        <input type="text" id="list-icon-input" placeholder="例如：📋 🎯 💪" value="📋">
       </div>
     </div>
-
-    <div id="sync-status-btn" class="sync-status" onclick="openSyncModal()" title="点击配置云同步">
-      <span class="sync-dot"></span>
-      <span id="sync-status-text">未配置</span>
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="list-delete-btn" style="display:none; margin-right:auto;" onclick="deleteCurrentList()">删除清单</button>
+      <button class="btn btn-secondary" onclick="closeListModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveList()">保存</button>
     </div>
-  </div>
-
-  <div id="project-list" class="project-list"></div>
-
-  <div id="empty-state" class="empty-state" style="display:none">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-    </svg>
-    <h3>暂无任务</h3>
-    <p>点击「新增任务」开始记录工作</p>
   </div>
 </div>
 
@@ -638,14 +342,8 @@
         <textarea id="input-note" placeholder="记录当前进展、遇到的问题等..."></textarea>
       </div>
       <div class="form-row">
-        <div class="form-group">
-          <label>预计完成</label>
-          <input type="date" id="input-due">
-        </div>
-        <div class="form-group">
-          <label>实际完成</label>
-          <input type="date" id="input-done">
-        </div>
+        <div class="form-group"><label>预计完成</label><input type="date" id="input-due"></div>
+        <div class="form-group"><label>实际完成</label><input type="date" id="input-done"></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -672,10 +370,7 @@
         <div class="update-history" id="update-history-list"></div>
       </div>
       <div class="form-row">
-        <div class="form-group">
-          <label>更新日期</label>
-          <input type="date" id="update-date">
-        </div>
+        <div class="form-group"><label>更新日期</label><input type="date" id="update-date"></div>
         <div class="form-group">
           <label>新状态（可选）</label>
           <select id="update-status">
@@ -738,9 +433,7 @@
           <div class="rte-content" id="rte-content" contenteditable="true"></div>
         </div>
       </div>
-      <div style="font-size: 12px; color: #999; margin-top: 4px;">
-        💡 提示：支持直接粘贴图片、粘贴链接、拖拽图片到编辑器
-      </div>
+      <div style="font-size: 12px; color: #999; margin-top: 4px;">💡 提示：支持直接粘贴图片、粘贴链接、拖拽图片到编辑器</div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-danger" onclick="deleteCurrentDoc()" id="resource-delete-btn" style="display:none; margin-right: auto;">删除文档</button>
@@ -750,6 +443,21 @@
   </div>
 </div>
 
+<!-- 文档查看 Modal -->
+<div class="modal-overlay" id="doc-view-modal">
+  <div class="modal" style="max-width: 800px;">
+    <div class="modal-header">
+      <h2 id="doc-view-title">查看文档</h2>
+      <button class="modal-close" onclick="closeDocView()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="doc-view-content" style="font-size: 14px; line-height: 1.7; color: #333; padding: 8px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeDocView()">关闭</button>
+    </div>
+  </div>
+</div>
 
 <!-- 云同步设置 Modal -->
 <div class="modal-overlay" id="sync-modal">
@@ -786,48 +494,47 @@
   </div>
 </div>
 
-<!-- 文档查看 Modal -->
-<div class="modal-overlay" id="doc-view-modal">
-  <div class="modal" style="max-width: 800px;">
-    <div class="modal-header">
-      <h2 id="doc-view-title">查看文档</h2>
-      <button class="modal-close" onclick="closeDocView()">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div id="doc-view-content" style="font-size: 14px; line-height: 1.7; color: #333; padding: 8px;"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeDocView()">关闭</button>
-    </div>
-  </div>
+<!-- 图片查看 -->
+<div class="image-view-overlay" id="image-view-overlay" onclick="closeImageView()">
+  <button class="image-view-close">&times;</button>
+  <img id="image-view-img" src="" alt="">
 </div>
 
 <script>
-// ========== 数据存储 ==========
-let STORAGE_KEY = 'work_task_list_v5';
-let RESOURCES_KEY = 'work_project_resources';
-const USERS_KEY = 'worklist_users';
+// ========== 数据 ==========
+let currentListId = localStorage.getItem('worklist_current_list') || 'default';
+let listsData = {};
 let tasks = [];
 let projectResources = {};
 let editingId = null;
 let updatingId = null;
 let currentResourceProject = null;
-let currentResourceType = 'note';
+let currentResourceDocIdx = null;
 let activeHistoryPopover = null;
+let editingListId = null;
 
 function load() {
   try {
-    if (currentUser) {
-      const data = localStorage.getItem(STORAGE_KEY);
-      if (data) {
-        const parsed = JSON.parse(data);
-        if (Array.isArray(parsed)) tasks = parsed;
-        else if (parsed.tasks && Array.isArray(parsed.tasks)) tasks = parsed.tasks;
-      }
-      const resData = localStorage.getItem(RESOURCES_KEY);
-      if (resData) projectResources = JSON.parse(resData);
+    const listsDataStr = localStorage.getItem('worklist_lists');
+    if (listsDataStr) listsData = JSON.parse(listsDataStr);
+    // 迁移旧数据
+    if (Object.keys(listsData).length === 0) {
+      const oldData = localStorage.getItem('work_task_list_v5');
+      const oldRes = localStorage.getItem('work_project_resources');
+      listsData = {
+        'default': {
+          id: 'default', name: '工作清单', icon: '📋',
+          tasks: oldData ? JSON.parse(oldData) : [],
+          projectResources: oldRes ? JSON.parse(oldRes) : {}
+        }
+      };
+      saveListsData();
     }
-  } catch(e) { tasks = []; projectResources = {}; }
+    if (!listsData[currentListId]) currentListId = Object.keys(listsData)[0] || 'default';
+    const list = listsData[currentListId] || { tasks: [], projectResources: {} };
+    tasks = list.tasks || [];
+    projectResources = list.projectResources || {};
+  } catch(e) { tasks = []; projectResources = {}; listsData = {}; }
   tasks.forEach(t => {
     if (!t.updates || !Array.isArray(t.updates)) {
       t.updates = [{ date: t.date || new Date().toISOString().split('T')[0], content: t.note || '' }];
@@ -835,49 +542,51 @@ function load() {
   });
   initSampleData();
   render();
+  renderSidebar();
+  updateTitle();
+  cloudSync.init();
+}
+
+function saveListsData() {
+  localStorage.setItem('worklist_lists', JSON.stringify(listsData));
+  localStorage.setItem('worklist_current_list', currentListId);
 }
 
 function save() {
-  if (!currentUser) return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-  localStorage.setItem(RESOURCES_KEY, JSON.stringify(projectResources));
-  render();
+  if (listsData[currentListId]) {
+    listsData[currentListId].tasks = tasks;
+    listsData[currentListId].projectResources = projectResources;
+  }
+  saveListsData();
+  renderSidebar();
   if (cloudSync.token && cloudSync.gistId) {
     cloudSync.push().catch(() => {});
   }
 }
 
 function saveResourcesOnly() {
-  if (!currentUser) return;
-  localStorage.setItem(RESOURCES_KEY, JSON.stringify(projectResources));
-  render();
+  if (listsData[currentListId]) {
+    listsData[currentListId].projectResources = projectResources;
+  }
+  saveListsData();
+  renderSidebar();
   if (cloudSync.token && cloudSync.gistId) {
     cloudSync.push().catch(() => {});
   }
 }
 
-function getLatestUpdate(t) {
-  if (!t.updates || t.updates.length === 0) return null;
-  return t.updates[t.updates.length - 1];
-}
+function getLatestUpdate(t) { return (!t.updates || t.updates.length === 0) ? null : t.updates[t.updates.length - 1]; }
 function getLatestDate(t) { const u = getLatestUpdate(t); return u ? u.date : (t.date || ''); }
 function getLatestNote(t) { const u = getLatestUpdate(t); return u ? u.content : (t.note || ''); }
 function getProjectStats(projectName) {
-  const projectTasks = tasks.filter(t => t.project === projectName);
-  return {
-    total: projectTasks.length,
-    done: projectTasks.filter(t => t.status === '已完成').length,
-    inProgress: projectTasks.filter(t => t.status === '进行中').length,
-    todo: projectTasks.filter(t => t.status === '待办').length,
-  };
+  const pt = tasks.filter(t => t.project === projectName);
+  return { total: pt.length, done: pt.filter(t => t.status === '已完成').length, inProgress: pt.filter(t => t.status === '进行中').length, todo: pt.filter(t => t.status === '待办').length };
 }
 
 function initSampleData() {
   if (tasks.length > 0) return;
-  if (cloudSync.token && cloudSync.gistId) {
-    cloudSync.pull().catch(() => {});
-    return;
-  }
+  if (cloudSync.token && cloudSync.gistId) { cloudSync.pull().catch(() => {}); return; }
+  if (!listsData[currentListId]) return;
   const today = new Date().toISOString().split('T')[0];
   tasks = [
     { id: 1, date: today, project: '华理未来学习中心', task: '系统梳理：华东理工大学多层次信息化学习平台', status: '进行中', priority: '高', due: '', done: '', updates: [
@@ -936,27 +645,19 @@ function initSampleData() {
 function render() {
   const statusFilter = document.getElementById('filter-status').value;
   const search = document.getElementById('search-input').value.toLowerCase();
-
   const allProjects = [];
   const seen = new Set();
   tasks.forEach(t => { if (!seen.has(t.project)) { seen.add(t.project); allProjects.push(t.project); } });
-
   let filteredTasks = tasks.filter(t => {
     if (statusFilter && t.status !== statusFilter) return false;
-    if (search) {
-      const text = (t.project + t.task + getLatestNote(t) + t.status).toLowerCase();
-      if (!text.includes(search)) return false;
-    }
+    if (search) { const text = (t.project + t.task + getLatestNote(t) + t.status).toLowerCase(); if (!text.includes(search)) return false; }
     return true;
   });
-
   const visibleProjectSet = new Set();
   filteredTasks.forEach(t => visibleProjectSet.add(t.project));
   const orderedVisibleProjects = allProjects.filter(p => visibleProjectSet.has(p));
-
   const listEl = document.getElementById('project-list');
   listEl.innerHTML = '';
-
   if (orderedVisibleProjects.length === 0) {
     document.getElementById('empty-state').style.display = 'block';
   } else {
@@ -975,118 +676,55 @@ function render() {
       card.addEventListener('drop', handleCardDrop);
       card.addEventListener('dragenter', handleCardDragEnter);
       card.addEventListener('dragleave', handleCardDragLeave);
-
       let tasksHtml = '';
       projectTasks.forEach((t, i) => {
         const latestUpdate = getLatestUpdate(t);
         const latestDate = latestUpdate ? latestUpdate.date : '';
         const latestContent = latestUpdate ? latestUpdate.content : '';
         const updateCount = t.updates ? t.updates.length : 0;
-        tasksHtml += `
-          <tr class="task-row" draggable="true" data-task-id="${t.id}" data-project="${esc(t.project)}">
-            <td style="width:40px;text-align:center;"><span class="task-drag-handle">⋮⋮</span></td>
-            <td>${esc(t.task)}</td>
-            <td style="width:100px"><span class="status-badge status-${t.status.replace(/\//g, '')}" onclick="cycleStatus(${t.id})">${esc(t.status)}</span></td>
-            <td style="width:70px"><span class="priority-badge priority-${t.priority}">${esc(t.priority)}</span></td>
-            <td style="min-width:280px">
-              <div class="note-text"><span class="note-date">${latestDate}</span> ${esc(latestContent)}</div>
-              ${updateCount > 1 ? `<button class="btn btn-link" onclick="showHistory(event, ${t.id})">查看历史 (${updateCount})</button>` : ''}
-            </td>
-            <td style="width:110px">${latestDate || '<em>-</em>'}</td>
-            <td style="width:100px">${t.due || '<em>-</em>'}</td>
-            <td style="width:100px">${t.done || '<em>-</em>'}</td>
-            <td style="width:160px">
-              <div class="actions">
-                <button class="btn btn-success btn-sm" onclick="openUpdateModal(${t.id})">更新</button>
-                <button class="btn btn-secondary btn-sm" onclick="editTask(${t.id})">编辑</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteTask(${t.id})">删除</button>
-              </div>
-            </td>
-          </tr>
-        `;
+        tasksHtml += '<tr class="task-row" draggable="true" data-task-id="' + t.id + '" data-project="' + esc(t.project) + '">' +
+          '<td style="width:40px;text-align:center;"><span class="task-drag-handle">⋮⋮</span></td>' +
+          '<td>' + esc(t.task) + '</td>' +
+          '<td style="width:100px"><span class="status-badge status-' + t.status.replace(/\//g, '') + '" onclick="cycleStatus(' + t.id + ')">' + esc(t.status) + '</span></td>' +
+          '<td style="width:70px"><span class="priority-badge priority-' + t.priority + '">' + esc(t.priority) + '</span></td>' +
+          '<td style="min-width:280px"><div class="note-text"><span class="note-date">' + latestDate + '</span> ' + esc(latestContent) + '</div>' + (updateCount > 1 ? '<button class="btn btn-link" onclick="showHistory(event, ' + t.id + ')">查看历史 (' + updateCount + ')</button>' : '') + '</td>' +
+          '<td style="width:110px">' + (latestDate || '<em>-</em>') + '</td>' +
+          '<td style="width:100px">' + (t.due || '<em>-</em>') + '</td>' +
+          '<td style="width:100px">' + (t.done || '<em>-</em>') + '</td>' +
+          '<td style="width:160px"><div class="actions"><button class="btn btn-success btn-sm" onclick="openUpdateModal(' + t.id + ')">更新</button><button class="btn btn-secondary btn-sm" onclick="editTask(' + t.id + ')">编辑</button><button class="btn btn-danger btn-sm" onclick="deleteTask(' + t.id + ')">删除</button></div></td>' +
+          '</tr>';
       });
-
-      // 资源箱 HTML
       let resourcesHtml = '';
       if (resources.length === 0) {
         resourcesHtml = '<div class="resource-empty"><div class="icon">📁</div><div>暂无资料，点击「添加文档」开始收集</div></div>';
       } else {
         resourcesHtml = resources.map((r, idx) => {
-          // 生成纯文本预览（去除 HTML 标签）
           const tempDiv = document.createElement('div');
           tempDiv.innerHTML = r.html || '';
-          let previewText = tempDiv.textContent || tempDiv.innerText || '';
-          previewText = previewText.substring(0, 120).trim();
+          let previewText = (tempDiv.textContent || tempDiv.innerText || '').substring(0, 120).trim();
           if ((r.html || '').length > 120) previewText += '...';
-          return `
-            <div class="doc-card" onclick="viewDoc('${esc(projectName)}', ${idx})">
-              <div class="doc-card-header">
-                <div class="doc-card-title">${esc(r.title)}</div>
-                <div class="doc-card-date">${r.date || ''}</div>
-              </div>
-              <div class="doc-card-preview">${previewText || '无内容预览'}</div>
-              <div class="doc-card-actions">
-                <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();openResourceModal('${esc(projectName)}', ${idx})">编辑</button>
-                <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteResource('${esc(projectName)}', ${idx})">删除</button>
-              </div>
-            </div>
-          `;
+          return '<div class="doc-card" onclick="viewDoc(\'' + esc(projectName) + '\', ' + idx + ')">' +
+            '<div class="doc-card-header"><div class="doc-card-title">' + esc(r.title) + '</div><div class="doc-card-date">' + r.date + '</div></div>' +
+            '<div class="doc-card-preview">' + (previewText || '无内容预览') + '</div>' +
+            '<div class="doc-card-actions"><button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();openResourceModal(\'' + esc(projectName) + '\', ' + idx + ')">编辑</button><button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteResource(\'' + esc(projectName) + '\', ' + idx + ')">删除</button></div></div>';
         }).join('');
       }
-
-      const expanded = localStorage.getItem('resource_expanded_' + projectName) === 'true';
-
-      card.innerHTML = `
-        <div class="project-header">
-          <div class="drag-handle">⋮⋮</div>
-          <div class="project-title">${esc(projectName)}</div>
-          <div class="project-meta">
-            <span class="project-badge">${stats.total} 任务</span>
-            <span class="project-progress" style="color:#27ae60">${stats.done} 完成</span>
-            <span class="project-progress" style="color:#d35400">${stats.inProgress} 进行中</span>
-            <span class="project-progress" style="color:#c0392b">${stats.todo} 待办</span>
-          </div>
-        </div>
-        <table class="task-table-inner">
-          <thead>
-            <tr>
-              <th style="width:40px"></th>
-              <th>任务</th>
-              <th>状态</th>
-              <th>优先级</th>
-              <th>进展/备注</th>
-              <th>日期</th>
-              <th>预计完成</th>
-              <th>实际完成</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>${tasksHtml}</tbody>
-        </table>
-        <div class="resource-box">
-          <div class="resource-box-header" onclick="toggleResourceBox('${esc(projectName)}')">
-            <div class="resource-box-header-left">
-              <span class="icon">📁</span>
-              <span>项目资料</span>
-              <span class="count">${resources.length}</span>
-            </div>
-            <div style="display:flex;gap:10px;align-items:center;">
-              <button class="btn btn-xs btn-primary" style="padding:4px 10px;font-size:11px;" onclick="event.stopPropagation();openResourceModal('${esc(projectName)}')">+ 添加文档</button>
-              <span class="resource-toggle ${expanded ? 'expanded' : ''}">▼</span>
-            </div>
-          </div>
-          <div class="resource-box-body ${expanded ? 'expanded' : ''}" id="resource-body-${esc(projectName)}">
-            <div class="resource-toolbar">
-              <button class="btn btn-xs btn-secondary" onclick="openResourceModal('${esc(projectName)}')">📝 添加文档</button>
-            </div>
-            <div class="resource-list">${resourcesHtml}</div>
-          </div>
-        </div>
-      `;
+      const expanded = localStorage.getItem('resource_expanded_' + currentListId + '_' + projectName) === 'true';
+      card.innerHTML = '<div class="project-header">' +
+        '<div class="drag-handle">⋮⋮</div>' +
+        '<div class="project-title">' + esc(projectName) + '</div>' +
+        '<div class="project-meta"><span class="project-badge">' + stats.total + ' 任务</span><span class="project-progress" style="color:#27ae60">' + stats.done + ' 完成</span><span class="project-progress" style="color:#d35400">' + stats.inProgress + ' 进行中</span><span class="project-progress" style="color:#c0392b">' + stats.todo + ' 待办</span></div>' +
+        '</div>' +
+        '<table class="task-table-inner"><thead><tr><th style="width:40px"></th><th>任务</th><th>状态</th><th>优先级</th><th>进展/备注</th><th>日期</th><th>预计完成</th><th>实际完成</th><th>操作</th></tr></thead><tbody>' + tasksHtml + '</tbody></table>' +
+        '<div class="resource-box"><div class="resource-box-header" onclick="toggleResourceBox(\'' + esc(projectName) + '\')">' +
+        '<div class="resource-box-header-left"><span class="icon">📁</span><span>项目资料</span><span class="count">' + resources.length + '</span></div>' +
+        '<div style="display:flex;gap:10px;align-items:center;"><button class="btn btn-xs btn-primary" style="padding:4px 10px;font-size:11px;" onclick="event.stopPropagation();openResourceModal(\'' + esc(projectName) + '\')">+ 添加文档</button><span class="resource-toggle ' + (expanded ? 'expanded' : '') + '">▼</span></div>' +
+        '</div>' +
+        '<div class="resource-box-body ' + (expanded ? 'expanded' : '') + '"><div class="resource-toolbar"><button class="btn btn-xs btn-secondary" onclick="openResourceModal(\'' + esc(projectName) + '\')">📝 添加文档</button></div>' +
+        '<div class="resource-list">' + resourcesHtml + '</div></div></div>';
       listEl.appendChild(card);
     });
   }
-
   document.querySelectorAll('.task-row').forEach(row => {
     row.addEventListener('dragstart', handleTaskDragStart);
     row.addEventListener('dragend', handleTaskDragEnd);
@@ -1095,152 +733,168 @@ function render() {
     row.addEventListener('dragenter', handleTaskDragEnter);
     row.addEventListener('dragleave', handleTaskDragLeave);
   });
-
   updateStats();
   updateDatalist();
 }
 
-// ========== 资源箱展开/折叠 ==========
-function toggleResourceBox(projectName) {
-  const key = 'resource_expanded_' + projectName;
-  const current = localStorage.getItem(key) === 'true';
-  localStorage.setItem(key, !current);
-  render();
+function updateTitle() {
+  const list = listsData[currentListId];
+  if (list) {
+    document.getElementById('current-list-title').textContent = (list.icon || '📋') + ' ' + list.name;
+    document.title = list.name + ' - 清单管理';
+  }
 }
 
-// ========== 项目卡片拖拽 ==========
+// ========== 侧边栏 ==========
+function renderSidebar() {
+  const container = document.getElementById('list-container');
+  if (!container) return;
+  const listIds = Object.keys(listsData);
+  if (listIds.length === 0) {
+    listsData['default'] = { id: 'default', name: '工作清单', icon: '📋', tasks: [], projectResources: {} };
+    currentListId = 'default';
+    saveListsData();
+  }
+  container.innerHTML = listIds.map(id => {
+    const list = listsData[id];
+    const count = (list.tasks || []).length;
+    const isActive = id === currentListId;
+    return '<div class="list-item ' + (isActive ? 'active' : '') + '" onclick="switchList(\'' + id + '\')">' +
+      '<span class="list-icon">' + (list.icon || '📋') + '</span>' +
+      '<span class="list-name">' + esc(list.name) + '</span>' +
+      '<span class="list-count">' + count + '</span>' +
+      '<span class="list-menu" onclick="event.stopPropagation();openListModal(\'' + id + '\')">⋯</span>' +
+      '</div>';
+  }).join('');
+}
+
+function switchList(listId) {
+  if (!listsData[listId]) return;
+  if (listsData[currentListId]) {
+    listsData[currentListId].tasks = tasks;
+    listsData[currentListId].projectResources = projectResources;
+  }
+  saveListsData();
+  currentListId = listId;
+  localStorage.setItem('worklist_current_list', currentListId);
+  const list = listsData[listId];
+  tasks = list.tasks || [];
+  projectResources = list.projectResources || {};
+  renderSidebar();
+  render();
+  updateTitle();
+}
+
+function openListModal(listId) {
+  editingListId = listId || null;
+  const title = document.getElementById('list-modal-title');
+  const deleteBtn = document.getElementById('list-delete-btn');
+  const nameInput = document.getElementById('list-name-input');
+  const iconInput = document.getElementById('list-icon-input');
+  if (listId && listsData[listId]) {
+    title.textContent = '编辑清单';
+    deleteBtn.style.display = 'inline-flex';
+    nameInput.value = listsData[listId].name || '';
+    iconInput.value = listsData[listId].icon || '📋';
+  } else {
+    title.textContent = '添加清单';
+    deleteBtn.style.display = 'none';
+    nameInput.value = '';
+    iconInput.value = '📋';
+  }
+  document.getElementById('list-modal').classList.add('active');
+}
+
+function closeListModal() { document.getElementById('list-modal').classList.remove('active'); editingListId = null; }
+
+function saveList() {
+  const name = document.getElementById('list-name-input').value.trim();
+  const icon = document.getElementById('list-icon-input').value.trim() || '📋';
+  if (!name) { alert('请输入清单名称'); return; }
+  if (editingListId && listsData[editingListId]) {
+    listsData[editingListId].name = name;
+    listsData[editingListId].icon = icon;
+  } else {
+    const id = 'list_' + Date.now();
+    listsData[id] = { id, name, icon, tasks: [], projectResources: {} };
+    currentListId = id; tasks = []; projectResources = {};
+  }
+  saveListsData();
+  renderSidebar();
+  render();
+  updateTitle();
+  closeListModal();
+}
+
+function deleteCurrentList() {
+  if (!editingListId || !listsData[editingListId]) return;
+  if (!confirm('确定删除清单 "' + listsData[editingListId].name + '"？该清单的所有数据也将被删除。')) return;
+  delete listsData[editingListId];
+  const remaining = Object.keys(listsData);
+  if (remaining.length === 0) {
+    listsData['default'] = { id: 'default', name: '工作清单', icon: '📋', tasks: [], projectResources: {} };
+    currentListId = 'default';
+  } else { currentListId = remaining[0]; }
+  const list = listsData[currentListId];
+  tasks = list.tasks || [];
+  projectResources = list.projectResources || {};
+  saveListsData();
+  renderSidebar();
+  render();
+  updateTitle();
+  closeListModal();
+}
+
+// ========== 拖拽 ==========
 let draggedCardProject = null;
-function handleCardDragStart(e) {
-  draggedCardProject = this.dataset.project;
-  this.classList.add('dragging');
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('card', draggedCardProject);
-}
-function handleCardDragEnd(e) {
-  this.classList.remove('dragging');
-  document.querySelectorAll('.project-card').forEach(c => c.classList.remove('drag-over'));
-  draggedCardProject = null;
-}
+function handleCardDragStart(e) { draggedCardProject = this.dataset.project; this.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('card', draggedCardProject); }
+function handleCardDragEnd(e) { this.classList.remove('dragging'); document.querySelectorAll('.project-card').forEach(c => c.classList.remove('drag-over')); draggedCardProject = null; }
 function handleCardDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
-function handleCardDragEnter(e) {
-  e.preventDefault();
-  if (this.dataset.project !== draggedCardProject) this.classList.add('drag-over');
-}
+function handleCardDragEnter(e) { e.preventDefault(); if (this.dataset.project !== draggedCardProject) this.classList.add('drag-over'); }
 function handleCardDragLeave(e) { this.classList.remove('drag-over'); }
 function handleCardDrop(e) {
-  e.preventDefault();
-  this.classList.remove('drag-over');
-  const source = e.dataTransfer.getData('card');
-  const target = this.dataset.project;
+  e.preventDefault(); this.classList.remove('drag-over');
+  const source = e.dataTransfer.getData('card'); const target = this.dataset.project;
   if (!source || source === target) return;
   const cards = [...document.querySelectorAll('.project-card')];
   const visibleProjects = cards.map(c => c.dataset.project);
   const allProjects = [...new Set(tasks.map(t => t.project))];
   const hiddenProjects = allProjects.filter(p => !visibleProjects.includes(p));
-  const newTasks = [];
-  visibleProjects.forEach(p => newTasks.push(...tasks.filter(t => t.project === p)));
-  hiddenProjects.forEach(p => newTasks.push(...tasks.filter(t => t.project === p)));
-  tasks = newTasks;
-  save();
+  const newTasks = []; visibleProjects.forEach(p => newTasks.push(...tasks.filter(t => t.project === p))); hiddenProjects.forEach(p => newTasks.push(...tasks.filter(t => t.project === p)));
+  tasks = newTasks; save();
 }
 
-// ========== 任务行拖拽 ==========
 let draggedTaskId = null;
-function handleTaskDragStart(e) {
-  draggedTaskId = parseInt(this.dataset.taskId);
-  this.classList.add('dragging-row');
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('task', draggedTaskId);
-  e.stopPropagation();
-}
-function handleTaskDragEnd(e) {
-  this.classList.remove('dragging-row');
-  document.querySelectorAll('.task-row').forEach(r => r.classList.remove('drag-over-row'));
-  draggedTaskId = null;
-}
+function handleTaskDragStart(e) { draggedTaskId = parseInt(this.dataset.taskId); this.classList.add('dragging-row'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('task', draggedTaskId); e.stopPropagation(); }
+function handleTaskDragEnd(e) { this.classList.remove('dragging-row'); document.querySelectorAll('.task-row').forEach(r => r.classList.remove('drag-over-row')); draggedTaskId = null; }
 function handleTaskDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; e.stopPropagation(); }
-function handleTaskDragEnter(e) {
-  e.preventDefault(); e.stopPropagation();
-  const sourceId = parseInt(e.dataTransfer.getData('task')) || draggedTaskId;
-  if (sourceId && this.dataset.project === document.querySelector(`[data-task-id="${sourceId}"]`)?.dataset.project) {
-    this.classList.add('drag-over-row');
-  }
-}
+function handleTaskDragEnter(e) { e.preventDefault(); e.stopPropagation(); const sourceId = parseInt(e.dataTransfer.getData('task')) || draggedTaskId; if (sourceId && this.dataset.project === document.querySelector('[data-task-id="' + sourceId + '"]')?.dataset.project) { this.classList.add('drag-over-row'); } }
 function handleTaskDragLeave(e) { this.classList.remove('drag-over-row'); }
-function handleTaskDrop(e) {
-  e.preventDefault(); e.stopPropagation();
-  this.classList.remove('drag-over-row');
-  const sourceId = parseInt(e.dataTransfer.getData('task'));
-  const targetId = parseInt(this.dataset.taskId);
-  if (!sourceId || sourceId === targetId) return;
-  const sourceTask = tasks.find(t => t.id === sourceId);
-  const targetTask = tasks.find(t => t.id === targetId);
-  if (!sourceTask || !targetTask || sourceTask.project !== targetTask.project) return;
-  const project = sourceTask.project;
-  const projectTasks = tasks.filter(t => t.project === project);
-  const sourceIdx = projectTasks.findIndex(t => t.id === sourceId);
-  const targetIdx = projectTasks.findIndex(t => t.id === targetId);
-  if (sourceIdx === -1 || targetIdx === -1) return;
-  const [moved] = projectTasks.splice(sourceIdx, 1);
-  projectTasks.splice(targetIdx, 0, moved);
-  const otherTasks = tasks.filter(t => t.project !== project);
-  const allProjects = [...new Set(tasks.map(t => t.project))];
-  const projectIdx = allProjects.indexOf(project);
-  const laterProjects = allProjects.slice(projectIdx + 1);
-  const insertIdx = otherTasks.findIndex(t => laterProjects.includes(t.project));
-  if (insertIdx === -1) tasks = [...otherTasks, ...projectTasks];
-  else tasks = [...otherTasks.slice(0, insertIdx), ...projectTasks, ...otherTasks.slice(insertIdx)];
-  save();
-}
+function handleTaskDrop(e) { e.preventDefault(); e.stopPropagation(); this.classList.remove('drag-over-row'); const sourceId = parseInt(e.dataTransfer.getData('task')); const targetId = parseInt(this.dataset.taskId); if (!sourceId || sourceId === targetId) return; const sourceTask = tasks.find(t => t.id === sourceId); const targetTask = tasks.find(t => t.id === targetId); if (!sourceTask || !targetTask || sourceTask.project !== targetTask.project) return; const project = sourceTask.project; const projectTasks = tasks.filter(t => t.project === project); const sourceIdx = projectTasks.findIndex(t => t.id === sourceId); const targetIdx = projectTasks.findIndex(t => t.id === targetId); if (sourceIdx === -1 || targetIdx === -1) return; const [moved] = projectTasks.splice(sourceIdx, 1); projectTasks.splice(targetIdx, 0, moved); const otherTasks = tasks.filter(t => t.project !== project); const allProjects = [...new Set(tasks.map(t => t.project))]; const projectIdx = allProjects.indexOf(project); const laterProjects = allProjects.slice(projectIdx + 1); const insertIdx = otherTasks.findIndex(t => laterProjects.includes(t.project)); if (insertIdx === -1) tasks = [...otherTasks, ...projectTasks]; else tasks = [...otherTasks.slice(0, insertIdx), ...projectTasks, ...otherTasks.slice(insertIdx)]; save(); }
 
 // ========== 查看历史 ==========
 function showHistory(event, taskId) {
   event.stopPropagation();
   if (activeHistoryPopover) { activeHistoryPopover.remove(); activeHistoryPopover = null; }
-  const t = tasks.find(x => x.id === taskId);
-  if (!t.updates || t.updates.length === 0) return;
-  const popover = document.createElement('div');
-  popover.className = 'history-popover';
-  const historyHtml = [...t.updates].reverse().map((u, i) => {
-    return `<div class="update-item" style="${i===0 ? 'background:#f8f9ff;padding:8px;border-radius:6px;' : ''}"><span class="update-date">${u.date}</span><span class="update-content">${esc(u.content)}</span></div>`;
-  }).join('');
-  popover.innerHTML = `
-    <button class="pop-close" onclick="closeHistory()">&times;</button>
-    <div class="pop-title">📋 ${esc(t.task)} 更新历史</div>
-    ${historyHtml}
-  `;
-  const btn = event.target;
-  const rect = btn.getBoundingClientRect();
-  const container = document.querySelector('.container');
-  container.appendChild(popover);
-  activeHistoryPopover = popover;
-  const popRect = popover.getBoundingClientRect();
-  let top = rect.top - popRect.height - 10 + window.scrollY;
-  let left = rect.left + window.scrollX;
-  if (top < 10) top = rect.bottom + 10 + window.scrollY;
-  if (left + popRect.width > window.innerWidth - 20) left = window.innerWidth - popRect.width - 20;
-  popover.style.top = top + 'px';
-  popover.style.left = left + 'px';
+  const t = tasks.find(x => x.id === taskId); if (!t.updates || t.updates.length === 0) return;
+  const popover = document.createElement('div'); popover.className = 'history-popover';
+  const historyHtml = [...t.updates].reverse().map((u, i) => '<div class="update-item" style="' + (i === 0 ? 'background:#f8f9ff;padding:8px;border-radius:6px;' : '') + '"><span class="update-date">' + u.date + '</span><span class="update-content">' + esc(u.content) + '</span></div>').join('');
+  popover.innerHTML = '<button class="pop-close" onclick="closeHistory()">&times;</button><div class="pop-title">📋 ' + esc(t.task) + ' 更新历史</div>' + historyHtml;
+  const btn = event.target; const rect = btn.getBoundingClientRect(); const container = document.querySelector('.container'); container.appendChild(popover); activeHistoryPopover = popover;
+  const popRect = popover.getBoundingClientRect(); let top = rect.top - popRect.height - 10 + window.scrollY; let left = rect.left + window.scrollX; if (top < 10) top = rect.bottom + 10 + window.scrollY; if (left + popRect.width > window.innerWidth - 20) left = window.innerWidth - popRect.width - 20;
+  popover.style.top = top + 'px'; popover.style.left = left + 'px';
 }
-function closeHistory() {
-  if (activeHistoryPopover) { activeHistoryPopover.remove(); activeHistoryPopover = null; }
-}
-document.addEventListener('click', (e) => {
-  if (activeHistoryPopover && !activeHistoryPopover.contains(e.target) && !e.target.closest('.btn-link')) {
-    closeHistory();
-  }
-});
+function closeHistory() { if (activeHistoryPopover) { activeHistoryPopover.remove(); activeHistoryPopover = null; } }
+document.addEventListener('click', (e) => { if (activeHistoryPopover && !activeHistoryPopover.contains(e.target) && !e.target.closest('.btn-link')) { closeHistory(); } });
 
-// ========== 项目资料操作（富文本） ==========
-let currentResourceDocIdx = null;
+// ========== 资源箱 ==========
+function toggleResourceBox(projectName) { const key = 'resource_expanded_' + currentListId + '_' + projectName; const current = localStorage.getItem(key) === 'true'; localStorage.setItem(key, !current); render(); }
 
 function openResourceModal(projectName, docIdx) {
-  currentResourceProject = projectName;
-  currentResourceDocIdx = docIdx !== undefined ? docIdx : null;
+  currentResourceProject = projectName; currentResourceDocIdx = docIdx !== undefined ? docIdx : null;
   const isEdit = currentResourceDocIdx !== null;
   document.getElementById('resource-modal-title').textContent = isEdit ? '编辑文档' : '添加文档';
   document.getElementById('resource-delete-btn').style.display = isEdit ? 'inline-flex' : 'none';
-
   if (isEdit && projectResources[projectName] && projectResources[projectName][docIdx]) {
     const doc = projectResources[projectName][docIdx];
     document.getElementById('resource-title').value = doc.title || '';
@@ -1252,144 +906,60 @@ function openResourceModal(projectName, docIdx) {
     document.getElementById('rte-content').innerHTML = '';
   }
   document.getElementById('resource-modal').classList.add('active');
-  // 聚焦编辑器
   setTimeout(() => document.getElementById('rte-content').focus(), 100);
 }
-
-function closeResourceModal() {
-  document.getElementById('resource-modal').classList.remove('active');
-  currentResourceProject = null;
-  currentResourceDocIdx = null;
-}
-
+function closeResourceModal() { document.getElementById('resource-modal').classList.remove('active'); currentResourceProject = null; currentResourceDocIdx = null; }
 function viewDoc(projectName, idx) {
-  const doc = projectResources[projectName] && projectResources[projectName][idx];
-  if (!doc) return;
+  const doc = projectResources[projectName] && projectResources[projectName][idx]; if (!doc) return;
   document.getElementById('doc-view-title').textContent = doc.title || '文档';
   document.getElementById('doc-view-content').innerHTML = doc.html || '<p style="color:#999;">无内容</p>';
   document.getElementById('doc-view-modal').classList.add('active');
 }
-function closeDocView() {
-  document.getElementById('doc-view-modal').classList.remove('active');
-}
-
-function deleteCurrentDoc() {
-  if (currentResourceDocIdx !== null && currentResourceProject) {
-    deleteResource(currentResourceProject, currentResourceDocIdx);
-    closeResourceModal();
-  }
-}
-
+function closeDocView() { document.getElementById('doc-view-modal').classList.remove('active'); }
+function deleteCurrentDoc() { if (currentResourceDocIdx !== null && currentResourceProject) { deleteResource(currentResourceProject, currentResourceDocIdx); closeResourceModal(); } }
 function saveResource() {
   const title = document.getElementById('resource-title').value.trim();
   const date = document.getElementById('resource-date').value;
   const html = document.getElementById('rte-content').innerHTML.trim();
-  if (!title) { alert('请填写文档标题'); return; }
-  if (!date) { alert('请选择日期'); return; }
-
+  if (!title) { alert('请填写文档标题'); return; } if (!date) { alert('请选择日期'); return; }
   if (!projectResources[currentResourceProject]) projectResources[currentResourceProject] = [];
-
   const doc = { title, date, html };
-  if (currentResourceDocIdx !== null) {
-    projectResources[currentResourceProject][currentResourceDocIdx] = doc;
-  } else {
-    projectResources[currentResourceProject].push(doc);
-  }
-  saveResourcesOnly();
-  closeResourceModal();
+  if (currentResourceDocIdx !== null) { projectResources[currentResourceProject][currentResourceDocIdx] = doc; } else { projectResources[currentResourceProject].push(doc); }
+  saveResourcesOnly(); closeResourceModal();
 }
+function deleteResource(projectName, idx) { if (!confirm('确定删除这条文档？')) return; if (projectResources[projectName]) { projectResources[projectName].splice(idx, 1); if (projectResources[projectName].length === 0) delete projectResources[projectName]; saveResourcesOnly(); } }
+function viewImage(src) { document.getElementById('image-view-img').src = src; document.getElementById('image-view-overlay').classList.add('active'); }
+function closeImageView() { document.getElementById('image-view-overlay').classList.remove('active'); document.getElementById('image-view-img').src = ''; }
 
-function deleteResource(projectName, idx) {
-  if (!confirm('确定删除这条文档？')) return;
-  if (projectResources[projectName]) {
-    projectResources[projectName].splice(idx, 1);
-    if (projectResources[projectName].length === 0) delete projectResources[projectName];
-    saveResourcesOnly();
-  }
-}
+function rteFormat(cmd, value) { document.execCommand(cmd, false, value); document.getElementById('rte-content').focus(); }
+function rteInsertLink() { const url = prompt('请输入链接地址：', 'https://'); if (url && url !== 'https://') { document.execCommand('createLink', false, url); document.getElementById('rte-content').focus(); } }
+function rteInsertImage(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = e => { const img = '<img src="' + e.target.result + '" style="max-width:100%;border-radius:8px;margin:8px 0;">'; document.execCommand('insertHTML', false, img); document.getElementById('rte-content').focus(); }; reader.readAsDataURL(file); }
 
-// ========== 富文本编辑器功能 ==========
-function rteFormat(cmd, value) {
-  document.execCommand(cmd, false, value);
-  document.getElementById('rte-content').focus();
-}
-
-function rteInsertLink() {
-  const url = prompt('请输入链接地址：', 'https://');
-  if (url && url !== 'https://') {
-    document.execCommand('createLink', false, url);
-    document.getElementById('rte-content').focus();
-  }
-}
-
-function rteInsertImage(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = `<img src="${e.target.result}" style="max-width:100%;border-radius:8px;margin:8px 0;">`;
-    document.execCommand('insertHTML', false, img);
-    document.getElementById('rte-content').focus();
-  };
-  reader.readAsDataURL(file);
-}
-
-// 粘贴图片处理
 document.addEventListener('paste', function(e) {
   if (!e.target.closest('.rte-content')) return;
   const items = e.clipboardData.items;
   for (let i = 0; i < items.length; i++) {
     if (items[i].type.indexOf('image') !== -1) {
-      e.preventDefault();
-      const blob = items[i].getAsFile();
-      const reader = new FileReader();
-      reader.onload = ev => {
-        const img = `<img src="${ev.target.result}" style="max-width:100%;border-radius:8px;margin:8px 0;">`;
-        document.execCommand('insertHTML', false, img);
-      };
-      reader.readAsDataURL(blob);
-      return;
+      e.preventDefault(); const blob = items[i].getAsFile(); const reader = new FileReader();
+      reader.onload = ev => { const img = '<img src="' + ev.target.result + '" style="max-width:100%;border-radius:8px;margin:8px 0;">'; document.execCommand('insertHTML', false, img); };
+      reader.readAsDataURL(blob); return;
     }
   }
 });
-
-// 拖拽图片处理
-document.addEventListener('dragover', function(e) {
-  if (e.target.closest('.rte-content')) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; }
-});
+document.addEventListener('dragover', function(e) { if (e.target.closest('.rte-content')) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; } });
 document.addEventListener('drop', function(e) {
   if (!e.target.closest('.rte-content')) return;
   const files = e.dataTransfer.files;
   if (files.length > 0 && files[0].type.indexOf('image') !== -1) {
-    e.preventDefault();
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const img = `<img src="${ev.target.result}" style="max-width:100%;border-radius:8px;margin:8px 0;">`;
-      document.execCommand('insertHTML', false, img);
-    };
+    e.preventDefault(); const reader = new FileReader();
+    reader.onload = ev => { const img = '<img src="' + ev.target.result + '" style="max-width:100%;border-radius:8px;margin:8px 0;">'; document.execCommand('insertHTML', false, img); };
     reader.readAsDataURL(files[0]);
   }
 });
 
-// ========== 工具函数 ==========
-function esc(s) { const div = document.createElement('div'); div.textContent = s; return div.innerHTML; }
-function updateStats() {
-  document.getElementById('stat-total').textContent = tasks.length;
-  document.getElementById('stat-todo').textContent = tasks.filter(t => t.status === '待办').length;
-  document.getElementById('stat-progress').textContent = tasks.filter(t => t.status === '进行中').length;
-  document.getElementById('stat-done').textContent = tasks.filter(t => t.status === '已完成').length;
-}
-function updateDatalist() {
-  const projects = [...new Set(tasks.map(t => t.project))].sort();
-  const dl = document.getElementById('project-list-dl');
-  dl.innerHTML = '';
-  projects.forEach(p => { const opt = document.createElement('option'); opt.value = p; dl.appendChild(opt); });
-}
-
 // ========== 任务操作 ==========
 function openModal(id) {
-  editingId = id || null;
-  document.getElementById('modal-title').textContent = id ? '编辑任务' : '新增任务';
+  editingId = id || null; document.getElementById('modal-title').textContent = id ? '编辑任务' : '新增任务';
   if (id) {
     const t = tasks.find(x => x.id === id);
     document.getElementById('input-project').value = t.project;
@@ -1424,10 +994,7 @@ function saveTask() {
   if (editingId) {
     const t = tasks.find(x => x.id === editingId);
     t.project = project; t.task = task; t.status = status; t.priority = priority; t.due = due; t.done = done;
-    if (note) {
-      const last = t.updates && t.updates.length > 0 ? t.updates[t.updates.length - 1] : null;
-      if (!last || last.content !== note) { if (!t.updates) t.updates = []; t.updates.push({ date: today, content: note }); }
-    }
+    if (note) { const last = t.updates && t.updates.length > 0 ? t.updates[t.updates.length - 1] : null; if (!last || last.content !== note) { if (!t.updates) t.updates = []; t.updates.push({ date: today, content: note }); } }
   } else {
     const id = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
     const updates = note ? [{ date: today, content: note }] : [];
@@ -1436,36 +1003,23 @@ function saveTask() {
   save(); closeModal();
 }
 function editTask(id) { openModal(id); }
-function deleteTask(id) {
-  if (!confirm('确定删除这条任务？')) return;
-  tasks = tasks.filter(t => t.id !== id);
-  save();
-}
+function deleteTask(id) { if (!confirm('确定删除这条任务？')) return; tasks = tasks.filter(t => t.id !== id); save(); }
 function cycleStatus(id) {
-  const t = tasks.find(x => x.id === id);
-  const states = ['待办', '进行中', '已完成', '阻塞/暂停', '取消'];
-  const idx = states.indexOf(t.status);
-  t.status = states[(idx + 1) % states.length];
+  const t = tasks.find(x => x.id === id); const states = ['待办', '进行中', '已完成', '阻塞/暂停', '取消'];
+  const idx = states.indexOf(t.status); t.status = states[(idx + 1) % states.length];
   if (t.status === '已完成' && !t.done) t.done = new Date().toISOString().split('T')[0];
-  const today = new Date().toISOString().split('T')[0];
-  if (!t.updates) t.updates = [];
-  t.updates.push({ date: today, content: `状态变更为「${t.status}」` });
-  save();
+  const today = new Date().toISOString().split('T')[0]; if (!t.updates) t.updates = []; t.updates.push({ date: today, content: '状态变更为「' + t.status + '」' }); save();
 }
 
-// ========== 更新操作 ==========
 function openUpdateModal(id) {
-  updatingId = id;
-  const t = tasks.find(x => x.id === id);
-  document.getElementById('update-task-name').textContent = `[${t.project}] ${t.task}`;
+  updatingId = id; const t = tasks.find(x => x.id === id);
+  document.getElementById('update-task-name').textContent = '[' + t.project + '] ' + t.task;
   document.getElementById('update-date').value = new Date().toISOString().split('T')[0];
   document.getElementById('update-status').value = '';
   document.getElementById('update-content').value = '';
   const historyList = document.getElementById('update-history-list');
-  if (t.updates && t.updates.length > 0) {
-    document.getElementById('update-history-section').style.display = 'block';
-    historyList.innerHTML = t.updates.map(u => `<div class="update-item"><span class="update-date">${u.date}</span><span class="update-content">${esc(u.content)}</span></div>`).reverse().join('');
-  } else { document.getElementById('update-history-section').style.display = 'none'; }
+  if (t.updates && t.updates.length > 0) { document.getElementById('update-history-section').style.display = 'block'; historyList.innerHTML = t.updates.map(u => '<div class="update-item"><span class="update-date">' + u.date + '</span><span class="update-content">' + esc(u.content) + '</span></div>').reverse().join(''); }
+  else { document.getElementById('update-history-section').style.display = 'none'; }
   document.getElementById('update-modal').classList.add('active');
 }
 function closeUpdateModal() { document.getElementById('update-modal').classList.remove('active'); updatingId = null; }
@@ -1474,438 +1028,92 @@ function saveUpdate() {
   const status = document.getElementById('update-status').value;
   const content = document.getElementById('update-content').value.trim();
   if (!date || !content) { alert('请填写更新日期和内容'); return; }
-  const t = tasks.find(x => x.id === updatingId);
-  if (!t.updates) t.updates = [];
-  t.updates.push({ date, content });
+  const t = tasks.find(x => x.id === updatingId); if (!t.updates) t.updates = []; t.updates.push({ date, content });
   if (status) { t.status = status; if (status === '已完成' && !t.done) t.done = date; }
   save(); closeUpdateModal();
 }
 
+function clearAll() { if (!confirm('确定清空当前清单所有任务？此操作不可恢复！')) return; tasks = []; projectResources = {}; if (listsData[currentListId]) { listsData[currentListId].tasks = []; listsData[currentListId].projectResources = {}; } saveListsData(); render(); }
+
+function updateStats() { document.getElementById('stat-total').textContent = tasks.length; document.getElementById('stat-todo').textContent = tasks.filter(t => t.status === '待办').length; document.getElementById('stat-progress').textContent = tasks.filter(t => t.status === '进行中').length; document.getElementById('stat-done').textContent = tasks.filter(t => t.status === '已完成').length; }
+function updateDatalist() { const projects = [...new Set(tasks.map(t => t.project))].sort(); const dl = document.getElementById('project-list-dl'); dl.innerHTML = ''; projects.forEach(p => { const opt = document.createElement('option'); opt.value = p; dl.appendChild(opt); }); }
+function esc(s) { const div = document.createElement('div'); div.textContent = s; return div.innerHTML; }
+
 function exportData() {
-  const data = JSON.stringify({ tasks, projectResources }, null, 2);
+  const data = JSON.stringify({ lists: listsData }, null, 2);
   const blob = new Blob([data], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `工作清单_${new Date().toISOString().split('T')[0]}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+  const a = document.createElement('a'); a.href = url; a.download = '清单备份_' + new Date().toISOString().split('T')[0] + '.json'; a.click(); URL.revokeObjectURL(url);
 }
 function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+  const file = event.target.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
     try {
       const data = JSON.parse(e.target.result);
-      if (Array.isArray(data)) {
-        if (!confirm(`导入 ${data.length} 条任务，将覆盖现有数据？`)) return;
-        tasks = data;
-        projectResources = {};
-        tasks.forEach(t => { if (!t.updates || !Array.isArray(t.updates)) t.updates = [{ date: t.date || new Date().toISOString().split('T')[0], content: t.note || '' }]; });
-        save(); alert('导入成功！');
-      } else if (data.tasks && Array.isArray(data.tasks)) {
-        if (!confirm(`导入 ${data.tasks.length} 条任务，将覆盖现有数据？`)) return;
-        tasks = data.tasks;
-        projectResources = data.projectResources || {};
-        tasks.forEach(t => { if (!t.updates || !Array.isArray(t.updates)) t.updates = [{ date: t.date || new Date().toISOString().split('T')[0], content: t.note || '' }]; });
-        save(); alert('导入成功！');
+      if (data.lists && typeof data.lists === 'object') {
+        if (!confirm('导入数据将覆盖现有清单，确定？')) return;
+        listsData = data.lists; saveListsData();
+        const firstId = Object.keys(listsData)[0];
+        if (firstId) { currentListId = firstId; const list = listsData[firstId]; tasks = list.tasks || []; projectResources = list.projectResources || {}; tasks.forEach(t => { if (!t.updates || !Array.isArray(t.updates)) t.updates = [{ date: t.date || new Date().toISOString().split('T')[0], content: t.note || '' }]; }); }
+        render(); renderSidebar(); updateTitle(); alert('导入成功！');
+      } else if (Array.isArray(data)) {
+        if (!confirm('导入旧格式数据，将创建新清单？')) return;
+        const newId = 'list_' + Date.now(); listsData[newId] = { id: newId, name: '导入清单', icon: '📥', tasks: data, projectResources: {} };
+        currentListId = newId; tasks = data; tasks.forEach(t => { if (!t.updates || !Array.isArray(t.updates)) t.updates = [{ date: t.date || new Date().toISOString().split('T')[0], content: t.note || '' }]; });
+        saveListsData(); render(); renderSidebar(); updateTitle(); alert('导入成功！');
       } else { alert('文件格式不正确'); }
     } catch (err) { alert('导入失败：' + err.message); }
     event.target.value = '';
   };
   reader.readAsText(file);
 }
-function clearAll() {
-  if (!confirm('确定清空所有任务？此操作不可恢复！')) return;
-  tasks = []; projectResources = {};
-  if (currentUser) save();
-  else render();
-}
 
-// 点击遮罩关闭
+// ========== 云同步 ==========
+const cloudSync = {
+  apiBase: 'https://api.github.com',
+  get token() { return localStorage.getItem('github_token') || ''; },
+  get gistId() { return localStorage.getItem('github_gist_id') || ''; },
+  get lastSync() { return localStorage.getItem('github_last_sync') || ''; },
+  setToken(v) { localStorage.setItem('github_token', v); },
+  setGistId(v) { localStorage.setItem('github_gist_id', v); },
+  setLastSync(v) { localStorage.setItem('github_last_sync', v); },
+  init() { this.updateUI(); },
+  updateUI() { const btn = document.getElementById('sync-status-btn'); const text = document.getElementById('sync-status-text'); if (!btn || !text) return; if (this.token && this.gistId) { btn.className = 'sync-status synced'; text.textContent = '已同步'; btn.title = '上次同步: ' + (this.lastSync || '未知'); } else { btn.className = 'sync-status'; text.textContent = '未配置'; btn.title = '点击配置云同步'; } },
+  async testToken(token) { const res = await fetch(this.apiBase + '/user', { headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' } }); if (!res.ok) throw new Error('Token 无效'); return await res.json(); },
+  async createGist(token) { const res = await fetch(this.apiBase + '/gists', { method: 'POST', headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify({ description: '清单数据备份', public: false, files: { 'worklist.json': { content: JSON.stringify({ lists: listsData || {}, version: 2, updatedAt: new Date().toISOString() }) } } }) }); if (!res.ok) throw new Error('创建 Gist 失败'); const data = await res.json(); return data.id; },
+  async pull() { if (!this.token || !this.gistId) return; const btn = document.getElementById('sync-status-btn'); const text = document.getElementById('sync-status-text'); if (btn) { btn.className = 'sync-status syncing'; text.textContent = '同步中...'; } try { const res = await fetch(this.apiBase + '/gists/' + this.gistId, { headers: { 'Authorization': 'token ' + this.token, 'Accept': 'application/vnd.github.v3+json' } }); if (!res.ok) throw new Error('拉取失败'); const data = await res.json(); const file = data.files['worklist.json']; if (!file) throw new Error('Gist 中没有数据文件'); const remote = JSON.parse(file.content); if (!tasks || tasks.length === 0) { if (remote.lists && typeof remote.lists === 'object') { listsData = remote.lists; saveListsData(); const firstId = Object.keys(listsData)[0]; if (firstId) { currentListId = firstId; const list = listsData[firstId]; tasks = list.tasks || []; projectResources = list.projectResources || {}; tasks.forEach(t => { if (!t.updates || !Array.isArray(t.updates)) t.updates = [{ date: t.date || new Date().toISOString().split('T')[0], content: t.note || '' }]; }); } } render(); renderSidebar(); updateTitle(); } this.setLastSync(new Date().toLocaleString()); this.updateUI(); } catch (err) { console.error('云同步拉取失败:', err); if (btn) { btn.className = 'sync-status error'; text.textContent = '同步失败'; } setTimeout(() => this.updateUI(), 3000); } },
+  async push() { if (!this.token || !this.gistId) return; const btn = document.getElementById('sync-status-btn'); const text = document.getElementById('sync-status-text'); if (btn) { btn.className = 'sync-status syncing'; text.textContent = '同步中...'; } try { const payload = JSON.stringify({ lists: listsData || {}, version: 2, updatedAt: new Date().toISOString() }); const res = await fetch(this.apiBase + '/gists/' + this.gistId, { method: 'PATCH', headers: { 'Authorization': 'token ' + this.token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify({ files: { 'worklist.json': { content: payload } } }) }); if (!res.ok) throw new Error('推送失败'); this.setLastSync(new Date().toLocaleString()); this.updateUI(); } catch (err) { console.error('云同步推送失败:', err); if (btn) { btn.className = 'sync-status error'; text.textContent = '同步失败'; } setTimeout(() => this.updateUI(), 3000); } }
+};
+
+function openSyncModal() {
+  const token = cloudSync.token; const gistId = cloudSync.gistId;
+  document.getElementById('sync-token').value = token;
+  const info = document.getElementById('sync-info'); const removeBtn = document.getElementById('sync-remove-btn'); const unconfigured = document.getElementById('sync-unconfigured');
+  if (token && gistId) { info.style.display = 'flex'; document.getElementById('sync-gist-id').textContent = gistId.substring(0, 8) + '...'; document.getElementById('sync-last-time').textContent = cloudSync.lastSync || '-'; removeBtn.style.display = 'inline-flex'; unconfigured.style.display = 'none'; } else { info.style.display = 'none'; removeBtn.style.display = 'none'; unconfigured.style.display = 'block'; }
+  document.getElementById('sync-modal').classList.add('active');
+}
+function closeSyncModal() { document.getElementById('sync-modal').classList.remove('active'); }
+async function saveSyncConfig() {
+  const token = document.getElementById('sync-token').value.trim(); if (!token) { alert('请输入 GitHub Token'); return; } if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) { alert('Token 格式不正确'); return; }
+  document.getElementById('sync-status-text').textContent = '验证中...';
+  try { await cloudSync.testToken(token); let gistId = cloudSync.gistId; if (!gistId) { gistId = await cloudSync.createGist(token); } cloudSync.setToken(token); cloudSync.setGistId(gistId); await cloudSync.push(); cloudSync.updateUI(); alert('配置成功！'); closeSyncModal(); } catch (err) { alert('配置失败: ' + err.message); cloudSync.updateUI(); }
+}
+function removeSync() { if (!confirm('确定移除云同步？')) return; localStorage.removeItem('github_token'); localStorage.removeItem('github_gist_id'); localStorage.removeItem('github_last_sync'); cloudSync.updateUI(); closeSyncModal(); }
+
 window.onclick = function(e) {
   if (e.target === document.getElementById('modal')) closeModal();
   if (e.target === document.getElementById('update-modal')) closeUpdateModal();
   if (e.target === document.getElementById('resource-modal')) closeResourceModal();
   if (e.target === document.getElementById('doc-view-modal')) closeDocView();
   if (e.target === document.getElementById('sync-modal')) closeSyncModal();
+  if (e.target === document.getElementById('list-modal')) closeListModal();
 };
 
-
-// ========== 用户管理 ==========
-let currentUser = localStorage.getItem('worklist_current_user') || '';
-
-function updateUserKeys() {
-  if (currentUser) {
-    STORAGE_KEY = 'work_task_list_v5_' + currentUser;
-    RESOURCES_KEY = 'work_project_resources_' + currentUser;
-  } else {
-    STORAGE_KEY = 'work_task_list_v5';
-    RESOURCES_KEY = 'work_project_resources';
-  }
-}
-
-function getUsers() {
-  try {
-    const data = localStorage.getItem(USERS_KEY);
-    if (data) return JSON.parse(data);
-  } catch (e) {}
-  return [];
-}
-
-function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
-function hashPassword(password) {
-  let hash = 0;
-  for (let i = 0; i < password.length; i++) {
-    const char = password.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return 'h' + Math.abs(hash).toString(16);
-}
-
-function handleLogin() {
-  const username = document.getElementById('login-username').value.trim();
-  const password = document.getElementById('login-password').value.trim();
-  const errorEl = document.getElementById('login-error');
-  if (!username || !password) {
-    errorEl.textContent = '请输入账号和密码';
-    errorEl.classList.add('show');
-    return;
-  }
-  const users = getUsers();
-  const user = users.find(u => u.username === username && u.passwordHash === hashPassword(password));
-  if (!user) {
-    errorEl.textContent = '账号或密码错误';
-    errorEl.classList.add('show');
-    return;
-  }
-  doLogin(username);
-}
-
-function handleRegister() {
-  const username = document.getElementById('login-username').value.trim();
-  const password = document.getElementById('login-password').value.trim();
-  const errorEl = document.getElementById('login-error');
-  if (!username || !password) {
-    errorEl.textContent = '请输入账号和密码';
-    errorEl.classList.add('show');
-    return;
-  }
-  if (username.length < 2 || password.length < 4) {
-    errorEl.textContent = '账号至少2位，密码至少4位';
-    errorEl.classList.add('show');
-    return;
-  }
-  const users = getUsers();
-  if (users.find(u => u.username === username)) {
-    errorEl.textContent = '该账号已存在';
-    errorEl.classList.add('show');
-    return;
-  }
-  users.push({ username, passwordHash: hashPassword(password) });
-  saveUsers(users);
-  doLogin(username);
-}
-
-function doLogin(username) {
-  currentUser = username;
-  localStorage.setItem('worklist_current_user', username);
-  updateUserKeys();
-  document.getElementById('login-overlay').classList.add('hidden');
-  document.getElementById('user-avatar').textContent = username.charAt(0).toUpperCase();
-  document.getElementById('dropdown-username').textContent = '👤 ' + username;
-  load();
-  cloudSync.init();
-  renderUserList();
-}
-
-function logout() {
-  if (!confirm('确定退出登录？')) return;
-  currentUser = '';
-  localStorage.removeItem('worklist_current_user');
-  updateUserKeys();
-  tasks = [];
-  projectResources = {};
-  document.getElementById('user-dropdown-menu').classList.remove('show');
-  document.getElementById('login-overlay').classList.remove('hidden');
-  document.getElementById('login-username').value = '';
-  document.getElementById('login-password').value = '';
-  document.getElementById('login-error').classList.remove('show');
-  renderUserList();
-}
-
-function switchToRegister() {
-  document.getElementById('login-btn').textContent = '注册';
-  document.getElementById('login-btn').onclick = handleRegister;
-  document.getElementById('login-subtitle').textContent = '创建新账号';
-  document.getElementById('login-switch').innerHTML = '已有账号？<a href="javascript:void(0)" onclick="switchToLogin()">立即登录</a>';
-  document.getElementById('login-error').classList.remove('show');
-  document.getElementById('login-password').value = '';
-}
-
-function switchToLogin() {
-  document.getElementById('login-btn').textContent = '登录';
-  document.getElementById('login-btn').onclick = handleLogin;
-  document.getElementById('login-subtitle').textContent = '请登录或注册';
-  document.getElementById('login-switch').innerHTML = '还没有账号？<a href="javascript:void(0)" onclick="switchToRegister()">立即注册</a>';
-  document.getElementById('login-error').classList.remove('show');
-  document.getElementById('login-password').value = '';
-}
-
-function renderUserList() {
-  const users = getUsers();
-  const container = document.getElementById('user-list-container');
-  const section = document.getElementById('user-list-section');
-  if (users.length === 0) {
-    section.style.display = 'none';
-    return;
-  }
-  section.style.display = 'block';
-  container.innerHTML = users.map(u => {
-    return '<div class="user-chip" onclick="quickLogin(\'' + esc(u.username) + '\')">' +
-      '<span class="name">👤 ' + esc(u.username) + '</span>' +
-      '<span class="delete" onclick="event.stopPropagation();deleteUser(\'' + esc(u.username) + '\')">×</span>' +
-      '</div>';
-  }).join('');
-}
-
-function quickLogin(username) {
-  document.getElementById('login-username').value = username;
-  document.getElementById('login-password').focus();
-  document.getElementById('login-error').classList.remove('show');
-}
-
-function deleteUser(username) {
-  if (!confirm('确定删除账号 "' + username + '"？该账号的所有数据也将被删除。')) return;
-  let users = getUsers();
-  users = users.filter(u => u.username !== username);
-  saveUsers(users);
-  localStorage.removeItem('work_task_list_v5_' + username);
-  localStorage.removeItem('work_project_resources_' + username);
-  localStorage.removeItem('github_token_' + username);
-  localStorage.removeItem('github_gist_id_' + username);
-  localStorage.removeItem('github_last_sync_' + username);
-  renderUserList();
-}
-
-function toggleUserDropdown(event) {
-  event.stopPropagation();
-  document.getElementById('user-dropdown-menu').classList.toggle('show');
-}
-
-document.addEventListener('click', (e) => {
-  const menu = document.getElementById('user-dropdown-menu');
-  if (menu && !e.target.closest('.user-dropdown')) {
-    menu.classList.remove('show');
-  }
-});
-
 // 初始化
-const cloudSync = {
-  getToken() { return currentUser ? localStorage.getItem('github_token_' + currentUser) || '' : ''; },
-  getGistId() { return currentUser ? localStorage.getItem('github_gist_id_' + currentUser) || '' : ''; },
-  getLastSync() { return currentUser ? localStorage.getItem('github_last_sync_' + currentUser) || '' : ''; },
-  setToken(v) { if (currentUser) localStorage.setItem('github_token_' + currentUser, v); },
-  setGistId(v) { if (currentUser) localStorage.setItem('github_gist_id_' + currentUser, v); },
-  setLastSync(v) { if (currentUser) localStorage.setItem('github_last_sync_' + currentUser, v); },
-  apiBase: 'https://api.github.com',
-  get token() { return this.getToken(); },
-  get gistId() { return this.getGistId(); },
-  get lastSync() { return this.getLastSync(); },
-
-  init() {
-    this.updateUI();
-  },
-
-  updateUI() {
-    const btn = document.getElementById('sync-status-btn');
-    const text = document.getElementById('sync-status-text');
-    if (!btn || !text) return;
-    if (this.token && this.gistId) {
-      btn.className = 'sync-status synced';
-      text.textContent = '已同步';
-      btn.title = '上次同步: ' + (this.lastSync || '未知');
-    } else {
-      btn.className = 'sync-status';
-      text.textContent = '未配置';
-      btn.title = '点击配置云同步';
-    }
-  },
-
-  async testToken(token) {
-    const res = await fetch(`${this.apiBase}/user`, {
-      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
-    });
-    if (!res.ok) throw new Error('Token 无效');
-    return await res.json();
-  },
-
-  async createGist(token) {
-    const res = await fetch(`${this.apiBase}/gists`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `token ${token}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        description: '工作清单数据备份',
-        public: false,
-        files: {
-          'worklist.json': {
-            content: JSON.stringify({ tasks: tasks || [], projectResources: projectResources || {}, version: 1, updatedAt: new Date().toISOString() })
-          }
-        }
-      })
-    });
-    if (!res.ok) throw new Error('创建 Gist 失败');
-    const data = await res.json();
-    return data.id;
-  },
-
-  async pull() {
-    if (!this.token || !this.gistId) return;
-    const btn = document.getElementById('sync-status-btn');
-    const text = document.getElementById('sync-status-text');
-    if (btn) { btn.className = 'sync-status syncing'; text.textContent = '同步中...'; }
-
-    try {
-      const res = await fetch(`${this.apiBase}/gists/${this.gistId}`, {
-        headers: { 'Authorization': `token ${this.token}`, 'Accept': 'application/vnd.github.v3+json' }
-      });
-      if (!res.ok) throw new Error('拉取失败');
-      const data = await res.json();
-      const file = data.files['worklist.json'];
-      if (!file) throw new Error('Gist 中没有数据文件');
-      const remote = JSON.parse(file.content);
-
-      if (!tasks || tasks.length === 0) {
-        if (remote.tasks && Array.isArray(remote.tasks)) {
-          tasks = remote.tasks;
-          tasks.forEach(t => { if (!t.updates || !Array.isArray(t.updates)) t.updates = [{ date: t.date || new Date().toISOString().split('T')[0], content: t.note || '' }]; });
-        }
-        if (remote.projectResources) projectResources = remote.projectResources;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-        localStorage.setItem(RESOURCES_KEY, JSON.stringify(projectResources));
-        render();
-      }
-
-      this.setLastSync(new Date().toLocaleString());
-      this.updateUI();
-    } catch (err) {
-      console.error('云同步拉取失败:', err);
-      if (btn) { btn.className = 'sync-status error'; text.textContent = '同步失败'; }
-      setTimeout(() => this.updateUI(), 3000);
-    }
-  },
-
-  async push() {
-    if (!this.token || !this.gistId) return;
-    const btn = document.getElementById('sync-status-btn');
-    const text = document.getElementById('sync-status-text');
-    if (btn) { btn.className = 'sync-status syncing'; text.textContent = '同步中...'; }
-
-    try {
-      const payload = JSON.stringify({ tasks: tasks || [], projectResources: projectResources || {}, version: 1, updatedAt: new Date().toISOString() });
-      const res = await fetch(`${this.apiBase}/gists/${this.gistId}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `token ${this.token}`,
-          'Accept': 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          files: { 'worklist.json': { content: payload } }
-        })
-      });
-      if (!res.ok) throw new Error('推送失败');
-      this.setLastSync(new Date().toLocaleString());
-      this.updateUI();
-    } catch (err) {
-      console.error('云同步推送失败:', err);
-      if (btn) { btn.className = 'sync-status error'; text.textContent = '同步失败'; }
-      setTimeout(() => this.updateUI(), 3000);
-    }
-  }
-};
-
-function openSyncModal() {
-  const token = cloudSync.getToken();
-  const gistId = cloudSync.getGistId();
-  document.getElementById('sync-token').value = token;
-  const info = document.getElementById('sync-info');
-  const removeBtn = document.getElementById('sync-remove-btn');
-  const unconfigured = document.getElementById('sync-unconfigured');
-  if (token && gistId) {
-    info.style.display = 'flex';
-    document.getElementById('sync-gist-id').textContent = gistId.substring(0, 8) + '...';
-    document.getElementById('sync-last-time').textContent = cloudSync.getLastSync() || '-';
-    removeBtn.style.display = 'inline-flex';
-    unconfigured.style.display = 'none';
-  } else {
-    info.style.display = 'none';
-    removeBtn.style.display = 'none';
-    unconfigured.style.display = 'block';
-  }
-  document.getElementById('sync-modal').classList.add('active');
-}
-
-function closeSyncModal() { document.getElementById('sync-modal').classList.remove('active'); }
-
-async function saveSyncConfig() {
-  const token = document.getElementById('sync-token').value.trim();
-  if (!token) { alert('请输入 GitHub Token'); return; }
-  if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) { alert('Token 格式不正确，应以 ghp_ 或 github_pat_ 开头'); return; }
-
-  document.getElementById('sync-status-text').textContent = '验证中...';
-  try {
-    await cloudSync.testToken(token);
-    let gistId = cloudSync.getGistId();
-    if (!gistId) {
-      gistId = await cloudSync.createGist(token);
-    }
-    cloudSync.setToken(token); cloudSync.setGistId(gistId);
-    await cloudSync.push();
-    cloudSync.updateUI();
-    alert('配置成功！数据已同步到云端。');
-    closeSyncModal();
-  } catch (err) {
-    alert('配置失败: ' + err.message);
-    cloudSync.updateUI();
-  }
-}
-
-function removeSync() {
-  if (!confirm('确定移除云同步？本地数据不会删除，但将不再自动同步到云端。')) return;
-  if (currentUser) {
-    localStorage.removeItem('github_token_' + currentUser);
-    localStorage.removeItem('github_gist_id_' + currentUser);
-    localStorage.removeItem('github_last_sync_' + currentUser);
-  }
-  // cloudSync getters are dynamic
-  cloudSync.updateUI();
-  closeSyncModal();
-}
-
-
-
-// 初始化
-updateUserKeys();
-if (currentUser) {
-  document.getElementById('login-overlay').classList.add('hidden');
-  document.getElementById('user-avatar').textContent = currentUser.charAt(0).toUpperCase();
-  document.getElementById('dropdown-username').textContent = '👤 ' + currentUser;
-  cloudSync.init();
-  load();
-} else {
-  renderUserList();
-}
+load();
 </script>
 
 </body>
 </html>
+
